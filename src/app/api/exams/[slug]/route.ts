@@ -66,7 +66,8 @@ export async function GET(
       JOIN organizations o ON e.conducting_org_id = o.id
       JOIN categories c ON e.category_id = c.id
       LEFT JOIN states s ON e.state_id = s.id
-      WHERE e.slug = $1 AND e.is_active = true`,
+      WHERE (e.slug = $1 OR e.slug = $1 || '-2027' OR REPLACE(e.slug, '-2027', '') = $1) AND e.is_active = true
+      LIMIT 1`,
       [slug]
     );
 

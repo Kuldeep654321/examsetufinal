@@ -53,10 +53,12 @@ export function ExamCard({ exam }: ExamCardProps) {
                 <span className="font-semibold text-slate-800 block truncate max-w-[170px] sm:max-w-[200px]">
                   {activeEvent.title}
                 </span>
-                <span className="text-[11px] text-slate-500">
-                  {activeEvent.end_date
-                    ? `Deadline: ${new Date(activeEvent.end_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
-                    : 'Schedule to be announced'}
+                <span className={`text-[11px] ${activeEvent.status === 'unannounced' || !activeEvent.end_date ? 'text-amber-700 font-medium' : 'text-slate-500'}`}>
+                  {activeEvent.status === 'unannounced'
+                    ? 'Not officially announced yet'
+                    : activeEvent.end_date
+                    ? `Deadline: ${new Date(activeEvent.end_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                    : 'Not officially announced yet'}
                 </span>
               </div>
             </div>
@@ -67,10 +69,12 @@ export function ExamCard({ exam }: ExamCardProps) {
                   ? 'bg-emerald-100 text-emerald-800'
                   : activeEvent.status === 'closing_soon'
                   ? 'bg-amber-100 text-amber-800 animate-pulse'
+                  : activeEvent.status === 'unannounced'
+                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
                   : 'bg-slate-200 text-slate-700'
               }`}
             >
-              {activeEvent.status.replace('_', ' ')}
+              {activeEvent.status === 'unannounced' ? 'Awaited' : activeEvent.status.replace('_', ' ')}
             </span>
           </div>
         )}

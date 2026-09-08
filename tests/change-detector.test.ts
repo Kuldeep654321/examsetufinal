@@ -25,11 +25,11 @@ describe('ChangeDetector & Diff Engine', () => {
 
   it('should return no changes when dates are identical to current database records', async () => {
     const extractedUpdate: ExtractedExamUpdate = {
-      targetExamSlug: 'neet-ug-2027',
+      targetExamSlug: 'clat-ug-2027',
       eventType: 'registration',
       title: 'Regular Notice',
       summary: 'Existing dates unchanged',
-      endDate: '2027-03-16', // Same as current database date for NEET
+      endDate: '2026-10-31', // Same as current database date for CLAT UG
       isExtension: false,
       confidence: 0.90,
       reasoning: 'Normal check',

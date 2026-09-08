@@ -47,7 +47,7 @@ const statusBadges: Record<
     icon: <AlertCircle className="w-3 h-3 text-amber-600 mr-1" />,
   },
   upcoming: {
-    label: 'Upcoming',
+    label: 'Upcoming (Notified)',
     bg: 'bg-blue-50',
     text: 'text-blue-700',
     border: 'border-blue-200',
@@ -68,11 +68,11 @@ const statusBadges: Record<
     icon: <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1"></span>,
   },
   unannounced: {
-    label: 'Not Announced',
-    bg: 'bg-slate-50',
-    text: 'text-slate-400',
-    border: 'border-slate-200',
-    icon: <Info className="w-3 h-3 text-slate-400 mr-1" />,
+    label: 'Not Officially Announced Yet',
+    bg: 'bg-amber-50/80',
+    text: 'text-amber-800',
+    border: 'border-amber-200',
+    icon: <Info className="w-3 h-3 text-amber-600 mr-1" />,
   },
   delayed: {
     label: 'Postponed / Delayed',
@@ -84,7 +84,7 @@ const statusBadges: Record<
 };
 
 function formatDate(dateStr: string | null) {
-  if (!dateStr) return 'Not officially announced';
+  if (!dateStr) return 'Not officially announced yet';
   return new Date(dateStr).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -152,7 +152,7 @@ export function EventTimeline({ events }: EventTimelineProps) {
                   <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
                     Start / Opening Date
                   </span>
-                  <span className="font-semibold text-slate-800">
+                  <span className={`font-semibold ${!event.start_date ? 'text-amber-700 italic' : 'text-slate-800'}`}>
                     {formatDate(event.start_date)}
                   </span>
                 </div>
@@ -162,7 +162,7 @@ export function EventTimeline({ events }: EventTimelineProps) {
                     End / Closing Deadline
                   </span>
                   <div>
-                    <span className="font-semibold text-slate-800">
+                    <span className={`font-semibold ${!event.end_date ? 'text-amber-700 italic' : 'text-slate-800'}`}>
                       {formatDate(event.end_date)}
                     </span>
                     {event.previous_end_date && (
@@ -174,8 +174,19 @@ export function EventTimeline({ events }: EventTimelineProps) {
                 </div>
               </div>
 
+              {/* Unannounced Notice */}
+              {event.status === 'unannounced' && (
+                <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs text-amber-900 mt-2 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="font-semibold block text-amber-950">Official Schedule Awaited:</strong>
+                    The conducting body has not officially released the dates for this stage yet. ExamSetu adheres to a zero-hallucination policy and updates within minutes of official gazette release.
+                  </div>
+                </div>
+              )}
+
               {/* Notes */}
-              {event.notes && (
+              {event.notes && event.status !== 'unannounced' && (
                 <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 mt-2 leading-relaxed">
                   <strong>Official Note:</strong> {event.notes}
                 </p>
