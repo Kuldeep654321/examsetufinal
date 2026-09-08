@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -27,6 +29,11 @@ export async function GET(
         opp.previous_deadline,
         opp.benefits,
         opp.financial_aid_amount,
+        opp.vacancies_count,
+        opp.salary_range,
+        opp.stipend_amount,
+        opp.department,
+        opp.role_designation,
         opp.application_process,
         opp.official_source_url,
         opp.official_portal_link,

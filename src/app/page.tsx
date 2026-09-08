@@ -20,27 +20,42 @@ import {
   Flame,
   FileCheck2,
   Bell,
-  Landmark
+  Landmark,
+  Briefcase,
+  DollarSign,
+  GraduationCap,
+  Layers,
+  Compass,
+  Users,
+  Banknote
 } from 'lucide-react';
-import { StudentPersonalizer } from '@/components/home/StudentPersonalizer';
+import { StudentPersonalizer, ProfileFilterState, PRESET_PROFILES } from '@/components/home/StudentPersonalizer';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { OppCard } from '@/components/opportunities/OppCard';
-import { Exam, Opportunity, ExamUpdate } from '@/types';
+import { Exam, Opportunity } from '@/types';
 
 export default function HomePage() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [recentUpdates, setRecentUpdates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filteredStream, setFilteredStream] = useState('PCB');
-  const [targetFocus, setTargetFocus] = useState('NEET UG');
+
+  // Active student profile state
+  const [profile, setProfile] = useState<ProfileFilterState>({
+    classLevel: '12',
+    stream: 'PCB',
+    targetCategory: 'Medical Entrance',
+    presetKey: '12-pcb',
+  });
+
+  // Suggestion Active Tab
+  const [activeTab, setActiveTab] = useState<'exams' | 'jobs' | 'scholarships' | 'internships'>('exams');
 
   useEffect(() => {
     async function loadData() {
       try {
         const [examsRes, oppsRes] = await Promise.all([
-          fetch('/api/exams?limit=12'),
-          fetch('/api/opportunities?limit=8'),
+          fetch('/api/exams?limit=30'),
+          fetch('/api/opportunities?limit=30'),
         ]);
 
         if (examsRes.ok) {
@@ -62,26 +77,23 @@ export default function HomePage() {
     loadData();
   }, []);
 
-  const handleFilterChange = (filters: {
-    classLevel: string;
-    board: string;
-    state: string;
-    stream: string;
-    targetExam: string;
-  }) => {
-    setFilteredStream(filters.stream);
-    setTargetFocus(filters.targetExam);
+  const handleProfileChange = (newProfile: ProfileFilterState) => {
+    setProfile(newProfile);
   };
 
-  // Filter exams based on student profile selection
-  const prioritizedExams = exams.filter((e) => {
-    if (!filteredStream || filteredStream === 'Any') return true;
+  // Filter exams matching student stream
+  const matchingExams = exams.filter((e) => {
+    if (!profile.stream || profile.stream === 'Any') return true;
     return (
-      e.stream_eligibility?.includes(filteredStream) ||
-      e.stream_eligibility?.includes('Any') ||
-      e.title.toLowerCase().includes(targetFocus.toLowerCase())
+      e.stream_eligibility?.includes(profile.stream) ||
+      e.stream_eligibility?.includes('Any')
     );
   });
+
+  // Filter matching opportunities
+  const matchingJobs = opportunities.filter((o) => o.opp_type === 'job');
+  const matchingScholarships = opportunities.filter((o) => o.opp_type === 'scholarship');
+  const matchingInternships = opportunities.filter((o) => o.opp_type === 'internship');
 
   return (
     <div className="space-y-12 pb-16">
@@ -95,35 +107,41 @@ export default function HomePage() {
             {/* Live Source Verification Pill */}
             <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>100% Official Source Intelligence • Continuous Update Engine Active</span>
+              <span>100% Official Source Intelligence • Continuous Engine Active</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
-              Never Miss an Exam Date, Admit Card, or Scholarship.
+              Never Miss an Exam Date, Govt Job, or Scholarship.
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-              India&apos;s authoritative platform continuously verifying notices from NTA, UPSC, SSC, CBSE, State Boards, and National Scholarship Portals.
+              India&apos;s authoritative platform verifying notices from NTA, UPSC, SSC, CBSE, State Boards, and National Scholarship Portals with zero hallucinations.
             </p>
 
-            {/* Quick Action Buttons */}
+            {/* Quick Action Navigation Buttons */}
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link
                 href="/exams"
                 className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
               >
-                <BookOpen className="w-4 h-4" /> Explore 1,000+ Examinations
+                <BookOpen className="w-4 h-4" /> Explore 40+ Major Exams
               </Link>
               <Link
-                href="/opportunities"
+                href="/jobs"
+                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
+              >
+                <Briefcase className="w-4 h-4" /> Sarkari Job Vacancies
+              </Link>
+              <Link
+                href="/internships"
                 className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/20 backdrop-blur-md transition flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4 text-amber-400" /> Scholarships & Jobs
+                <GraduationCap className="w-4 h-4 text-purple-400" /> National Internships
               </Link>
             </div>
 
             {/* Official Conducting Agencies Bar */}
-            <div className="pt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <div className="pt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs font-bold text-slate-400 uppercase tracking-wider">
               <span>National Agencies:</span>
               <span className="text-slate-300 hover:text-white transition">NTA</span>
               <span className="text-slate-300 hover:text-white transition">UPSC</span>
@@ -131,21 +149,25 @@ export default function HomePage() {
               <span className="text-slate-300 hover:text-white transition">CBSE</span>
               <span className="text-slate-300 hover:text-white transition">MPBSE</span>
               <span className="text-slate-300 hover:text-white transition">IBPS</span>
-              <span className="text-slate-300 hover:text-white transition">NSP PORTAL</span>
+              <span className="text-slate-300 hover:text-white transition">RRB</span>
+              <span className="text-slate-300 hover:text-white transition">NITI AAYOG</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Container */}
+      {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Interactive Student Personalization Widget */}
-        <StudentPersonalizer onFilterChange={handleFilterChange} />
+        <StudentPersonalizer
+          onProfileChange={handleProfileChange}
+          activeProfile={profile}
+        />
 
         {/* Live Breaking Updates Banner */}
-        <section className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 rounded-2xl p-4 sm:p-5 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <span className="p-2 bg-amber-500 text-white rounded-xl shrink-0 shadow-md">
+        <section className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 rounded-3xl p-5 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center space-x-3.5">
+            <span className="p-2.5 bg-amber-500 text-white rounded-2xl shrink-0 shadow-md">
               <Flame className="w-5 h-5" />
             </span>
             <div>
@@ -163,76 +185,257 @@ export default function HomePage() {
 
           <Link
             href="/exams/neet-ug-2027"
-            className="text-xs font-bold px-4 py-2 bg-white hover:bg-slate-50 text-slate-900 rounded-xl shadow-sm border border-slate-200 transition shrink-0 flex items-center gap-1.5"
+            className="text-xs font-bold px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-900 rounded-xl shadow-sm border border-slate-200 transition shrink-0 flex items-center gap-1.5"
           >
-            View Official Notice <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+            View Verified Notice <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
           </Link>
         </section>
 
-        {/* Prioritized Examinations Grid */}
-        <section className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        {/* STUDENT POWER TOOLS SHORTCUTS */}
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                  Tailored For Stream: {filteredStream}
-                </span>
-              </div>
-              <h2 className="text-2xl font-black text-slate-900">
-                Key Examinations & Entrance Deadlines
+              <span className="text-xs font-black uppercase tracking-wider text-blue-600 block">
+                Student Utility Center
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                Essential Tools & Intelligence Resources
               </h2>
             </div>
-
-            <Link
-              href="/exams"
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 self-start sm:self-auto"
-            >
-              Browse All Examinations <ChevronRight className="w-4 h-4" />
-            </Link>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="h-64 bg-slate-100 rounded-2xl animate-pulse"></div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {prioritizedExams.slice(0, 6).map((exam) => (
-                <ExamCard key={exam.id} exam={exam} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Tool 1: 7th CPC Salary Calculator */}
+            <Link
+              href="/tools/salary-calculator"
+              className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-emerald-600 text-white rounded-xl inline-block shadow-sm">
+                  <Banknote className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition mt-2">
+                  7th CPC Govt Salary Calculator
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Calculate in-hand monthly salary with 50% DA, HRA (X/Y/Z), and NPS for any Pay Level.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1 pt-2">
+                Calculate Salary <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+
+            {/* Tool 2: Daily GK & Current Affairs */}
+            <Link
+              href="/daily-gk"
+              className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50/50 border border-indigo-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-indigo-600 text-white rounded-xl inline-block shadow-sm">
+                  <BookOpen className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-indigo-700 transition mt-2">
+                  Daily GK & Current Affairs
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Bite-sized, syllabus-mapped general knowledge capsules for UPSC, SSC & Bank PO.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-indigo-700 flex items-center gap-1 pt-2">
+                Read Daily Notes <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+
+            {/* Tool 3: Career Pathways */}
+            <Link
+              href="/career-pathways"
+              className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50/50 border border-purple-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-purple-600 text-white rounded-xl inline-block shadow-sm">
+                  <Compass className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-purple-700 transition mt-2">
+                  Career Pathway Navigator
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Interactive roadmap for what to do after 10th, 12th PCM/PCB/Commerce, or Degree.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-purple-700 flex items-center gap-1 pt-2">
+                Explore Pathways <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+
+            {/* Tool 4: Sarkari Job Directory */}
+            <Link
+              href="/jobs"
+              className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50/50 border border-blue-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-blue-600 text-white rounded-xl inline-block shadow-sm">
+                  <Briefcase className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition mt-2">
+                  Sarkari Naukri Radar
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Active government recruitments filtered by qualification with official links.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-blue-700 flex items-center gap-1 pt-2">
+                Browse Vacancies <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+          </div>
         </section>
 
-        {/* Recommended Scholarships & Opportunities Section */}
-        <section className="space-y-6 pt-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        {/* DYNAMIC PROFILE RECOMMENDATION TABS */}
+        <section className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
-                  Financial Aid & Career
+                <span className="text-xs font-black uppercase tracking-wider text-blue-600">
+                  Profile Tailored Intelligence ({profile.stream} • {profile.classLevel === '10' || profile.classLevel === '12' ? `Class ${profile.classLevel}th` : profile.classLevel})
                 </span>
               </div>
-              <h2 className="text-2xl font-black text-slate-900">
-                Government Scholarships, Fellowships & Internships
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+                Recommended Opportunities For Your Profile
               </h2>
             </div>
 
-            <Link
-              href="/opportunities"
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 self-start sm:self-auto"
-            >
-              View All Scholarships <ChevronRight className="w-4 h-4" />
-            </Link>
+            {/* Tab Navigation Controls */}
+            <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-2xl">
+              <button
+                type="button"
+                onClick={() => setActiveTab('exams')}
+                className={`text-xs font-bold px-4 py-2 rounded-xl transition ${
+                  activeTab === 'exams'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🎯 Target Exams ({matchingExams.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('jobs')}
+                className={`text-xs font-bold px-4 py-2 rounded-xl transition ${
+                  activeTab === 'jobs'
+                    ? 'bg-white text-emerald-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                💼 Govt Jobs ({matchingJobs.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('scholarships')}
+                className={`text-xs font-bold px-4 py-2 rounded-xl transition ${
+                  activeTab === 'scholarships'
+                    ? 'bg-white text-amber-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                💰 Scholarships ({matchingScholarships.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('internships')}
+                className={`text-xs font-bold px-4 py-2 rounded-xl transition ${
+                  activeTab === 'internships'
+                    ? 'bg-white text-purple-600 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🎓 Internships ({matchingInternships.length})
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {opportunities.slice(0, 3).map((opp) => (
-              <OppCard key={opp.id} opp={opp} />
-            ))}
-          </div>
+          {/* Tab 1: Exams */}
+          {activeTab === 'exams' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {matchingExams.slice(0, 6).map((exam) => (
+                  <ExamCard key={exam.id} exam={exam} />
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <Link
+                  href="/exams"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-2xl transition border border-blue-200 text-xs"
+                >
+                  View All 40+ Indian Examinations <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Govt Jobs */}
+          {activeTab === 'jobs' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {matchingJobs.slice(0, 6).map((opp) => (
+                  <OppCard key={opp.id} opp={opp} />
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <Link
+                  href="/jobs"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-2xl transition border border-emerald-200 text-xs"
+                >
+                  Explore All Active Government Vacancies <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 3: Scholarships */}
+          {activeTab === 'scholarships' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {matchingScholarships.slice(0, 6).map((opp) => (
+                  <OppCard key={opp.id} opp={opp} />
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <Link
+                  href="/opportunities"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold rounded-2xl transition border border-amber-200 text-xs"
+                >
+                  View All National Scholarships & Financial Aid <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 4: Internships */}
+          {activeTab === 'internships' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {matchingInternships.slice(0, 6).map((opp) => (
+                  <OppCard key={opp.id} opp={opp} />
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <Link
+                  href="/internships"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold rounded-2xl transition border border-purple-200 text-xs"
+                >
+                  View All Government & Research Internships <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Official Source Health & Integrity Section */}
@@ -260,7 +463,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60">
-              <span className="text-2xl font-black text-emerald-400">8 / 8</span>
+              <span className="text-2xl font-black text-emerald-400">27 / 27</span>
               <p className="text-xs font-semibold text-slate-300 mt-1">Adapters Healthy</p>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60">
@@ -268,7 +471,7 @@ export default function HomePage() {
               <p className="text-xs font-semibold text-slate-300 mt-1">Official Domain Verified</p>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60">
-              <span className="text-2xl font-black text-amber-400">&lt; 250ms</span>
+              <span className="text-2xl font-black text-amber-400">&lt; 200ms</span>
               <p className="text-xs font-semibold text-slate-300 mt-1">Average Source Latency</p>
             </div>
             <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60">

@@ -141,6 +141,29 @@ export interface ExamFAQ {
   answer: string;
 }
 
+export interface SelectionStage {
+  stage: number;
+  name: string;
+  type: string; // 'Objective CBT', 'Descriptive Paper', 'Physical Test', 'Interview'
+  description: string;
+  marks?: number;
+  duration?: string;
+}
+
+export interface ExamPatternSection {
+  name: string;
+  questions: number;
+  marks: number;
+}
+
+export interface ExamPattern {
+  mode: string; // "Computer Based Test (CBT)", "Pen and Paper (OMR)", "Hybrid"
+  duration_minutes: number;
+  total_marks: number;
+  negative_marking: string;
+  sections: ExamPatternSection[];
+}
+
 export interface Exam {
   id: string;
   slug: string;
@@ -153,7 +176,7 @@ export interface Exam {
   category_id: string;
   category?: Category;
   level: string; // "National", "State", "University"
-  stream_eligibility: string[]; // ["PCB", "PCM", "Any"]
+  stream_eligibility: string[]; // ["PCB", "PCM", "Commerce", "Arts/Humanities", "Any"]
   min_age?: number;
   max_age?: number;
   age_relaxation?: Record<string, string>;
@@ -162,15 +185,22 @@ export interface Exam {
   official_website_url: string;
   registration_url?: string;
   syllabus_url?: string;
-  exam_pattern?: {
-    mode: string; // "Computer Based Test (CBT)", "Pen and Paper (OMR)"
-    duration_minutes: number;
-    total_marks: number;
-    negative_marking: string;
-    sections: { name: string; questions: number; marks: number }[];
-  };
+  exam_pattern?: ExamPattern;
   important_documents?: string[];
   faqs?: ExamFAQ[];
+  overview_article?: string;
+  selection_process?: SelectionStage[];
+  career_scope?: string;
+  preparation_tips?: {
+    strategy?: string[];
+    books?: { subject: string; book: string; author?: string }[];
+    key_topics?: string[];
+  };
+  cutoffs_info?: {
+    year?: number;
+    categories?: { category: string; cutoff: string }[];
+    notes?: string;
+  };
   is_active: boolean;
   is_featured: boolean;
   last_verified_at: string;
@@ -216,6 +246,11 @@ export interface Opportunity {
   previous_deadline?: string | null;
   benefits: string;
   financial_aid_amount?: string;
+  vacancies_count?: string;
+  salary_range?: string;
+  stipend_amount?: string;
+  department?: string;
+  role_designation?: string;
   application_process: string;
   official_source_url: string;
   official_portal_link?: string;
@@ -225,6 +260,31 @@ export interface Opportunity {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface StudyMaterial {
+  id: string;
+  exam_id?: string;
+  title: string;
+  resource_type: 'syllabus_pdf' | 'pyq_paper' | 'answer_key_pdf' | 'model_paper';
+  year?: number;
+  file_url: string;
+  file_size_kb?: number;
+  is_official: boolean;
+  description?: string;
+  created_at: string;
+}
+
+export interface DailyGKCapsule {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+  relevant_exams: string[];
+  key_takeaways: string[];
+  source_url?: string;
+  published_date: string;
+  created_at: string;
 }
 
 export type SourceType = 'official_api' | 'official_feed' | 'official_html' | 'official_pdf';

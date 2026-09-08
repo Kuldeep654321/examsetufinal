@@ -34,6 +34,11 @@ export async function GET(req: NextRequest) {
         opp.previous_deadline,
         opp.benefits,
         opp.financial_aid_amount,
+        opp.vacancies_count,
+        opp.salary_range,
+        opp.stipend_amount,
+        opp.department,
+        opp.role_designation,
         opp.application_process,
         opp.official_source_url,
         opp.official_portal_link,
@@ -82,6 +87,8 @@ export async function GET(req: NextRequest) {
         opp.title ILIKE $${paramIndex} OR
         opp.description ILIKE $${paramIndex} OR
         opp.qualification ILIKE $${paramIndex} OR
+        opp.department ILIKE $${paramIndex} OR
+        opp.role_designation ILIKE $${paramIndex} OR
         o.name ILIKE $${paramIndex}
       )`;
       params.push(`%${q}%`);
@@ -93,8 +100,12 @@ export async function GET(req: NextRequest) {
 
     const res = await query(sql, params);
 
-    const countRes = await query('SELECT COUNT(*) as total FROM opportunities');
-    const total = parseInt(countRes.rows[0].total, 10);
+    const countSql = type && type !== 'all'
+      ? `SELECT COUNT(*) as total FROM opportunities WHERE opp_type = $1`
+      : `SELECT COUNT(*) as total FROM opportunities`;
+    const countParams = type && type !== 'all' ? [type] : [];
+    const countRes = await query(countSql, countParams);
+    const total = parseInt(countRes.rows[0]?.total || '0', 10);
 
     return NextResponse.json({
       success: true,

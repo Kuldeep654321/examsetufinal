@@ -20,7 +20,12 @@ import {
   Info,
   Bookmark,
   Share2,
-  FileCheck2
+  FileCheck2,
+  Briefcase,
+  TrendingUp,
+  GraduationCap,
+  Sparkles,
+  DollarSign
 } from 'lucide-react';
 import { VerifiedBadge } from '@/components/exams/VerifiedBadge';
 import { OfficialSourceBox } from '@/components/exams/OfficialSourceBox';
@@ -51,6 +56,11 @@ async function getExamData(slug: string) {
       e.exam_pattern,
       e.important_documents,
       e.faqs,
+      e.overview_article,
+      e.selection_process,
+      e.career_scope,
+      e.preparation_tips,
+      e.cutoffs_info,
       e.is_featured,
       e.last_verified_at,
       e.created_at,
@@ -113,13 +123,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!exam) return { title: 'Exam Not Found - ExamSetu' };
 
   return {
-    title: `${exam.title} - Official Dates, Syllabus, Eligibility & Schedule | ExamSetu`,
-    description: `Official intelligence for ${exam.title} conducted by ${exam.conducting_org?.name}. Verified application deadlines, syllabus PDF, exam pattern, and result dates.`,
+    title: `${exam.title} - Official Dates, Comprehensive Guide, Syllabus & Pattern | ExamSetu`,
+    description: `Complete context, eligibility breakdown, syllabus PDF, exam pattern, cutoff history, and event timeline for ${exam.title} conducted by ${exam.conducting_org?.name}.`,
     alternates: {
       canonical: `https://examsetu.in/exams/${exam.slug}`,
     },
     openGraph: {
-      title: `${exam.title} - Verified Dates & Schedule`,
+      title: `${exam.title} - Verified Dates & Detailed Guide`,
       description: exam.eligibility_criteria,
       url: `https://examsetu.in/exams/${exam.slug}`,
       siteName: 'ExamSetu',
@@ -236,6 +246,47 @@ export default async function ExamDetailPage({ params }: PageProps) {
           </div>
         )}
 
+        {/* IN-DEPTH EXAM CONTEXT & ARTICLE */}
+        {exam.overview_article && (
+          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+              <span className="p-1.5 rounded-lg bg-blue-100 text-blue-700">
+                <BookOpen className="w-5 h-5" />
+              </span>
+              <div>
+                <span className="text-xs font-black uppercase tracking-wider text-blue-700 block">
+                  Authoritative Guide & Context
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  About {exam.short_title}: Comprehensive Overview
+                </h2>
+              </div>
+            </div>
+
+            <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm space-y-4 bg-slate-50/60 p-6 rounded-2xl border border-slate-100 whitespace-pre-line font-sans">
+              {exam.overview_article}
+            </div>
+          </section>
+        )}
+
+        {/* Career Scope & Institution Horizon */}
+        {exam.career_scope && (
+          <section className="bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+            <div className="flex items-center space-x-2 text-cyan-300">
+              <GraduationCap className="w-5 h-5" />
+              <span className="text-xs font-black uppercase tracking-wider">
+                Career Scope & Opportunities
+              </span>
+            </div>
+            <h3 className="text-xl font-black text-white">
+              What Careers and Colleges Does {exam.short_title} Lead To?
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+              {exam.career_scope}
+            </p>
+          </section>
+        )}
+
         {/* Event Schedule & Pipeline */}
         <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
           <div>
@@ -294,7 +345,112 @@ export default async function ExamDetailPage({ params }: PageProps) {
               </p>
             </div>
           </div>
+
+          {/* Age Relaxation Breakdown */}
+          {exam.age_relaxation && Object.keys(exam.age_relaxation).length > 0 && (
+            <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-2 text-xs">
+              <h4 className="font-bold text-blue-900 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-blue-600" /> Category-Wise Age Relaxation & Attempt Limits
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
+                {Object.entries(exam.age_relaxation).map(([cat, rule]: [string, any]) => (
+                  <div key={cat} className="p-2.5 bg-white rounded-xl border border-blue-100">
+                    <strong className="text-slate-900 block font-semibold">{cat}:</strong>
+                    <span>{rule}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
+
+        {/* Preparation Strategy & Recommended Books */}
+        {exam.preparation_tips && (
+          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div className="flex items-center space-x-2">
+              <span className="p-1.5 rounded-lg bg-amber-100 text-amber-700">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <h2 className="text-xl font-bold text-slate-900">
+                Preparation Strategy & Recommended Books
+              </h2>
+            </div>
+
+            {exam.preparation_tips.strategy && (
+              <div className="space-y-2 text-xs">
+                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                  Expert Preparation Roadmap:
+                </h4>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-700">
+                  {exam.preparation_tips.strategy.map((st: string, idx: number) => (
+                    <li key={idx} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>{st}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {exam.preparation_tips.books && exam.preparation_tips.books.length > 0 && (
+              <div className="space-y-2 text-xs pt-2">
+                <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                  Standard Recommended Books:
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {exam.preparation_tips.books.map((b: any, idx: number) => (
+                    <div key={idx} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                      <span className="text-[10px] font-black uppercase text-blue-700 px-2 py-0.5 bg-blue-50 rounded">
+                        {b.subject}
+                      </span>
+                      <p className="font-bold text-slate-900 pt-1">{b.book}</p>
+                      {b.author && <p className="text-slate-500 text-[11px]">Author: {b.author}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Cutoff Analysis */}
+        {exam.cutoffs_info && exam.cutoffs_info.categories && (
+          <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center space-x-2">
+              <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700">
+                <TrendingUp className="w-4 h-4" />
+              </span>
+              <h2 className="text-xl font-bold text-slate-900">
+                Cutoff History & Minimum Qualifying Trends
+              </h2>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left border border-slate-200 rounded-xl overflow-hidden">
+                <thead className="bg-slate-50 font-bold text-slate-700 uppercase tracking-wider">
+                  <tr>
+                    <th className="p-3 border-b border-slate-200">Category</th>
+                    <th className="p-3 border-b border-slate-200 text-right">Official Cutoff Score / Percentile</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                  {exam.cutoffs_info.categories.map((c: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-slate-50/80">
+                      <td className="p-3 font-semibold">{c.category}</td>
+                      <td className="p-3 text-right font-bold text-emerald-700">{c.cutoff}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {exam.cutoffs_info.notes && (
+              <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                💡 <strong>Verifier Note:</strong> {exam.cutoffs_info.notes}
+              </p>
+            )}
+          </section>
+        )}
 
         {/* Exam Pattern & Marking Scheme */}
         {exam.exam_pattern && (

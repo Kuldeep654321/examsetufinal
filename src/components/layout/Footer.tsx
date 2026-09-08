@@ -1,115 +1,124 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, ExternalLink, CheckCircle2, Lock, FileText, Heart } from 'lucide-react';
+import {
+  ShieldCheck,
+  BookOpen,
+  Sparkles,
+  Award,
+  Lock,
+  Heart,
+  ExternalLink,
+  Briefcase,
+  GraduationCap,
+  Banknote,
+  Flame,
+  Compass
+} from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-400 text-sm border-t border-slate-800">
-      {/* Trust & Transparency Banner */}
-      <div className="border-b border-slate-900 py-8 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start space-x-3">
-            <div className="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-400 shrink-0 border border-emerald-500/20">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-slate-200 text-sm">100% Official Source Truth</h4>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                We never scrape spam blogs or unverified aggregators. Every single date, pattern, and notification links directly to official conducting bodies.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400 shrink-0 border border-blue-500/20">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-slate-200 text-sm">Human Verified Verification</h4>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Automated change-detection flags date extensions and admit cards in real time. Our verification team reviews before final publishing.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400 shrink-0 border border-purple-500/20">
-              <Lock className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-slate-200 text-sm">Zero Clickbait & Pure Privacy</h4>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                No fake urgency, no popup ads, and no selling of student data. Your application tracking numbers and notes remain strictly private.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">
-        <div className="col-span-2 space-y-4">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
+    <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 text-xs">
+      {/* Top Banner */}
+      <div className="border-b border-slate-800/80 bg-slate-900/50 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black">
               ES
             </div>
-            <span className="font-black text-lg text-white tracking-tight">
-              Exam<span className="text-blue-500">Setu</span>
+            <div>
+              <p className="font-bold text-white text-sm">ExamSetu (examsetu.in)</p>
+              <p className="text-[11px] text-slate-400">
+                Official Indian Examination, Sarkari Job & Opportunity Intelligence Platform
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-6 text-[11px]">
+            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+              <ShieldCheck className="w-4 h-4" /> 100% Official Domain Extraction
+            </span>
+            <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
+              <Lock className="w-4 h-4" /> Zero Speculation / Hallucination
             </span>
           </div>
-          <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-            India&apos;s authoritative Exam & Opportunity Intelligence Platform. Real-time updates for CBSE, State Boards, NEET, JEE, UPSC, SSC, Banking, and verified Government Scholarships.
-          </p>
-          <div className="pt-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Official Production Domain</span>
-            <p className="text-sm font-semibold text-blue-400">examsetu.in</p>
-          </div>
         </div>
+      </div>
 
-        {/* Column 1: School & Boards */}
-        <div>
-          <p className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Boards & School</p>
-          <ul className="space-y-2 text-xs">
-            <li><Link href="/exams/cbse-class-12-board-2027" className="hover:text-blue-400 transition">CBSE Class 12 Boards</Link></li>
-            <li><Link href="/exams/cbse-class-10-board-2027" className="hover:text-blue-400 transition">CBSE Class 10 Boards</Link></li>
-            <li><Link href="/exams/mp-board-12th-hssc-2027" className="hover:text-blue-400 transition">MP Board 12th (MPBSE)</Link></li>
-            <li><Link href="/exams?category=school-boards" className="hover:text-blue-400 transition">All State Boards</Link></li>
+      {/* Main Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">
+        {/* Col 1: National Entrance Exams */}
+        <div className="space-y-3">
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Entrance Exams</h4>
+          <ul className="space-y-2">
+            <li><Link href="/exams/neet-ug-2027" className="hover:text-white transition">NEET UG (Medical)</Link></li>
+            <li><Link href="/exams/jee-main-2027" className="hover:text-white transition">JEE Main (Engineering)</Link></li>
+            <li><Link href="/exams/jee-advanced-2027" className="hover:text-white transition">JEE Advanced (IITs)</Link></li>
+            <li><Link href="/exams/cuet-ug-2027" className="hover:text-white transition">CUET UG (Universities)</Link></li>
+            <li><Link href="/exams/clat-ug-2027" className="hover:text-white transition">CLAT UG (Law)</Link></li>
+            <li><Link href="/exams/cat-2027" className="hover:text-white transition">CAT (IIMs MBA)</Link></li>
+            <li><Link href="/exams/gate-2027" className="hover:text-white transition">GATE 2027</Link></li>
           </ul>
         </div>
 
-        {/* Column 2: Entrance Exams */}
-        <div>
-          <p className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">National Entrance</p>
-          <ul className="space-y-2 text-xs">
-            <li><Link href="/exams/neet-ug-2027" className="hover:text-blue-400 transition">NEET UG 2027</Link></li>
-            <li><Link href="/exams/jee-main-2027" className="hover:text-blue-400 transition">JEE Main 2027</Link></li>
-            <li><Link href="/exams/cuet-ug-2027" className="hover:text-blue-400 transition">CUET UG 2027</Link></li>
-            <li><Link href="/exams/clat-ug-2027" className="hover:text-blue-400 transition">CLAT 2027 Law</Link></li>
-            <li><Link href="/exams/cat-2027" className="hover:text-blue-400 transition">CAT 2027 IIM</Link></li>
+        {/* Col 2: Sarkari Jobs & Defence */}
+        <div className="space-y-3">
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Govt Jobs & Defence</h4>
+          <ul className="space-y-2">
+            <li><Link href="/jobs" className="hover:text-white transition font-semibold text-emerald-400">All Govt Vacancies (Sarkari)</Link></li>
+            <li><Link href="/exams/upsc-cse-2027" className="hover:text-white transition">UPSC CSE (IAS / IPS)</Link></li>
+            <li><Link href="/exams/ssc-cgl-2027" className="hover:text-white transition">SSC CGL (14,582 Posts)</Link></li>
+            <li><Link href="/exams/rrb-ntpc-2027" className="hover:text-white transition">RRB NTPC (Railways)</Link></li>
+            <li><Link href="/exams/rrb-alp-2027" className="hover:text-white transition">RRB ALP (Loco Pilot)</Link></li>
+            <li><Link href="/exams/ibps-po-2027" className="hover:text-white transition">IBPS Bank PO</Link></li>
+            <li><Link href="/exams/upsc-nda-2027" className="hover:text-white transition">NDA & Naval Academy</Link></li>
           </ul>
         </div>
 
-        {/* Column 3: Govt & Scholarships */}
-        <div>
-          <p className="font-bold text-slate-200 text-xs uppercase tracking-wider mb-3">Govt & Opportunities</p>
-          <ul className="space-y-2 text-xs">
-            <li><Link href="/exams/upsc-cse-2027" className="hover:text-blue-400 transition">UPSC CSE (IAS/IPS)</Link></li>
-            <li><Link href="/exams/ssc-cgl-2027" className="hover:text-blue-400 transition">SSC CGL 2027</Link></li>
-            <li><Link href="/exams/mppsc-state-services-2027" className="hover:text-blue-400 transition">MPPSC SSE 2027</Link></li>
-            <li><Link href="/opportunities" className="hover:text-blue-400 transition">NSP Central Scholarship</Link></li>
-            <li><Link href="/opportunities/inspire-she-scholarship-dst-2027" className="hover:text-blue-400 transition">INSPIRE Scholarship</Link></li>
+        {/* Col 3: Student Tools & Resources */}
+        <div className="space-y-3">
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Student Power Tools</h4>
+          <ul className="space-y-2">
+            <li><Link href="/tools/salary-calculator" className="hover:text-white transition font-semibold text-emerald-400">7th CPC Salary Calculator</Link></li>
+            <li><Link href="/daily-gk" className="hover:text-white transition">Daily GK & Current Affairs</Link></li>
+            <li><Link href="/career-pathways" className="hover:text-white transition">Career Pathways Explorer</Link></li>
+            <li><Link href="/search" className="hover:text-white transition">Full-Text Exam Search</Link></li>
+            <li><Link href="/dashboard/tracker" className="hover:text-white transition">Application Milestone Tracker</Link></li>
+          </ul>
+        </div>
+
+        {/* Col 4: Internships & Scholarships */}
+        <div className="space-y-3">
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Internships & Aid</h4>
+          <ul className="space-y-2">
+            <li><Link href="/internships" className="hover:text-white transition text-purple-400 font-semibold">Government Internships</Link></li>
+            <li><Link href="/opportunities" className="hover:text-white transition">NSP National Scholarship</Link></li>
+            <li><Link href="/opportunities" className="hover:text-white transition">INSPIRE SHE (₹80k/yr)</Link></li>
+            <li><Link href="/opportunities" className="hover:text-white transition">PM Scholarship (PMSS)</Link></li>
+            <li><Link href="/internships" className="hover:text-white transition">RBI Summer Internship</Link></li>
+            <li><Link href="/internships" className="hover:text-white transition">NITI Aayog Policy Scheme</Link></li>
+          </ul>
+        </div>
+
+        {/* Col 5: Platform & Verification */}
+        <div className="space-y-3 col-span-2 md:col-span-1">
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Trust & Sources</h4>
+          <ul className="space-y-2">
+            <li><Link href="/admin/sources" className="hover:text-white transition">Official Sources Registry</Link></li>
+            <li><Link href="/admin/review-queue" className="hover:text-white transition">Verifier Review Queue</Link></li>
+            <li><Link href="/dashboard/profile" className="hover:text-white transition">Notification Settings</Link></li>
+            <li><a href="https://github.com/Kuldeep654321/examsetufinal" target="_blank" rel="noopener noreferrer" className="hover:text-white transition flex items-center gap-1">GitHub Repo <ExternalLink className="w-3 h-3" /></a></li>
           </ul>
         </div>
       </div>
 
-      {/* Official Government Disclaimer */}
-      <div className="border-t border-slate-900 py-6 text-center text-xs text-slate-500 px-4">
-        <p className="max-w-4xl mx-auto leading-relaxed">
-          <strong>Disclaimer:</strong> ExamSetu (examsetu.in) is an independent informational and intelligence platform for Indian students. We aggregate publicly accessible notices from official government and conducting agency domains (such as nta.ac.in, upsc.gov.in, ssc.gov.in, cbse.gov.in, mpbse.nic.in). Students are always advised to refer to the linked official source before taking critical decisions.
-        </p>
-        <p className="mt-3 flex items-center justify-center gap-1 text-[11px] text-slate-600">
-          Built with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> for students across India • © {new Date().getFullYear()} ExamSetu
-        </p>
+      {/* Bottom Bar */}
+      <div className="border-t border-slate-900 bg-slate-950 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
+          <p>© {new Date().getFullYear()} ExamSetu (examsetu.in). Dedicated to Indian Aspirants.</p>
+          <p className="text-slate-500">
+            Official Data Sourced directly from NTA, UPSC, SSC, CBSE, State Boards, and National Portals.
+          </p>
+        </div>
       </div>
     </footer>
   );

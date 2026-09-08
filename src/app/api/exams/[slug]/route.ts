@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
@@ -27,6 +29,11 @@ export async function GET(
         e.exam_pattern,
         e.important_documents,
         e.faqs,
+        e.overview_article,
+        e.selection_process,
+        e.career_scope,
+        e.preparation_tips,
+        e.cutoffs_info,
         e.is_featured,
         e.last_verified_at,
         e.created_at,
