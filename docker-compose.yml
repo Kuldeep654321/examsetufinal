@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: examsetu-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: examadmin
+      POSTGRES_PASSWORD: examsecret
+      POSTGRES_DB: examsetu
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/lib/db/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U examadmin -d examsetu"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: examsetu-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: examsetu-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://examadmin:examsecret@postgres:5432/examsetu
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=super-secure-production-ready-examsetu-jwt-secret-key-2026-indore-in
+      - APP_URL=https://examsetu.in
+      - NEXT_PUBLIC_APP_URL=https://examsetu.in
+      - NEXT_PUBLIC_APP_NAME="ExamSetu"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:
