@@ -165,29 +165,29 @@ export default function HomePage() {
         />
 
         {/* Live Breaking Updates Banner */}
-        <section className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 rounded-3xl p-5 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+        <section className="bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-amber-500/10 rounded-3xl p-5 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center space-x-3.5">
-            <span className="p-2.5 bg-amber-500 text-white rounded-2xl shrink-0 shadow-md">
-              <Flame className="w-5 h-5" />
+            <span className="p-2.5 bg-blue-600 text-white rounded-2xl shrink-0 shadow-md">
+              <Flame className="w-5 h-5 text-amber-300" />
             </span>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-amber-200 text-amber-900 rounded">
-                  Latest Verified Notice
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-blue-100 text-blue-900 rounded">
+                  Live Active Notification
                 </span>
-                <span className="text-xs text-slate-500">Official NTA Portal</span>
+                <span className="text-xs text-slate-500 font-semibold">Consortium of NLUs • Official Circular</span>
               </div>
               <p className="text-sm font-bold text-slate-900 mt-0.5">
-                NEET UG 2027: Online Application Window Extended up to 16 March 2027 (11:50 PM)
+                CLAT 2027: Online Registration Active on consortiumofnlus.ac.in (Apply before 31 Oct 2026) • Exam on 6 Dec 2026
               </p>
             </div>
           </div>
 
           <Link
-            href="/exams/neet-ug-2027"
+            href="/exams/clat-ug-2027"
             className="text-xs font-bold px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-900 rounded-xl shadow-sm border border-slate-200 transition shrink-0 flex items-center gap-1.5"
           >
-            View Verified Notice <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+            View Official Schedule <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
           </Link>
         </section>
 
