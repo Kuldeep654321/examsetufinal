@@ -25,7 +25,8 @@ import {
   GraduationCap,
   Banknote,
   Compass,
-  Flame
+  Flame,
+  Building2
 } from 'lucide-react';
 
 export function Navbar() {
@@ -102,63 +103,51 @@ export function Navbar() {
                 </span>
               </Link>
               <Link
-                href="/jobs"
+                href="/counselling"
                 className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
-                  pathname.startsWith('/jobs')
-                    ? 'text-emerald-700 bg-emerald-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <span className="flex items-center gap-1">
-                  <Briefcase className="w-3.5 h-3.5 text-emerald-600" /> Sarkari Jobs
-                </span>
-              </Link>
-              <Link
-                href="/internships"
-                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
-                  pathname.startsWith('/internships')
-                    ? 'text-purple-700 bg-purple-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <span className="flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-purple-600" /> Internships
-                </span>
-              </Link>
-              <Link
-                href="/opportunities"
-                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
-                  pathname === '/opportunities'
-                    ? 'text-amber-800 bg-amber-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <span className="flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Scholarships
-                </span>
-              </Link>
-              <Link
-                href="/tools/salary-calculator"
-                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
-                  pathname.startsWith('/tools/salary-calculator')
-                    ? 'text-emerald-700 bg-emerald-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <span className="flex items-center gap-1">
-                  <Banknote className="w-3.5 h-3.5 text-emerald-600" /> Pay Calculator
-                </span>
-              </Link>
-              <Link
-                href="/daily-gk"
-                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
-                  pathname.startsWith('/daily-gk')
+                  pathname.startsWith('/counselling')
                     ? 'text-indigo-700 bg-indigo-50'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 <span className="flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5 text-amber-500" /> Daily GK
+                  <Layers className="w-3.5 h-3.5 text-indigo-600" /> Counselling
+                </span>
+              </Link>
+              <Link
+                href="/institutions"
+                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
+                  pathname.startsWith('/institutions') || pathname.startsWith('/colleges')
+                    ? 'text-blue-700 bg-blue-50'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-center gap-1">
+                  <Building2 className="w-3.5 h-3.5 text-blue-600" /> Colleges
+                </span>
+              </Link>
+              <Link
+                href="/courses"
+                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
+                  pathname.startsWith('/courses')
+                    ? 'text-emerald-700 bg-emerald-50'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-center gap-1">
+                  <GraduationCap className="w-3.5 h-3.5 text-emerald-600" /> Courses
+                </span>
+              </Link>
+              <Link
+                href="/boards"
+                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
+                  pathname.startsWith('/boards')
+                    ? 'text-amber-800 bg-amber-50'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-center gap-1">
+                  <FileCheck2 className="w-3.5 h-3.5 text-amber-600" /> Boards
                 </span>
               </Link>
               <Link
@@ -171,6 +160,18 @@ export function Navbar() {
               >
                 <span className="flex items-center gap-1">
                   <Compass className="w-3.5 h-3.5 text-blue-600" /> Pathways
+                </span>
+              </Link>
+              <Link
+                href="/jobs"
+                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition ${
+                  pathname.startsWith('/jobs')
+                    ? 'text-emerald-700 bg-emerald-50'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <span className="flex items-center gap-1">
+                  <Briefcase className="w-3.5 h-3.5 text-emerald-600" /> Sarkari Jobs
                 </span>
               </Link>
             </nav>

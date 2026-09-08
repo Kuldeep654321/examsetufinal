@@ -74,15 +74,15 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Col 3: Student Tools & Resources */}
+        {/* Col 3: Education & Counselling Ecosystem */}
         <div className="space-y-3">
-          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Student Power Tools</h4>
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Admission & Colleges</h4>
           <ul className="space-y-2">
-            <li><Link href="/tools/salary-calculator" className="hover:text-white transition font-semibold text-emerald-400">7th CPC Salary Calculator</Link></li>
-            <li><Link href="/daily-gk" className="hover:text-white transition">Daily GK & Current Affairs</Link></li>
-            <li><Link href="/career-pathways" className="hover:text-white transition">Career Pathways Explorer</Link></li>
-            <li><Link href="/search" className="hover:text-white transition">Full-Text Exam Search</Link></li>
-            <li><Link href="/dashboard/tracker" className="hover:text-white transition">Application Milestone Tracker</Link></li>
+            <li><Link href="/counselling" className="hover:text-white transition font-semibold text-indigo-400">Counselling Systems (JoSAA/MCC)</Link></li>
+            <li><Link href="/institutions" className="hover:text-white transition">IITs, NITs, AIIMS & NLUs</Link></li>
+            <li><Link href="/courses" className="hover:text-white transition">UG / PG Degree Directory</Link></li>
+            <li><Link href="/boards" className="hover:text-white transition">Class 10 & 12 School Boards</Link></li>
+            <li><Link href="/career-pathways" className="hover:text-white transition text-blue-400 font-semibold">Student Pathways Engine</Link></li>
           </ul>
         </div>
 
@@ -93,16 +93,16 @@ export function Footer() {
             <li><Link href="/internships" className="hover:text-white transition text-purple-400 font-semibold">Government Internships</Link></li>
             <li><Link href="/opportunities" className="hover:text-white transition">NSP National Scholarship</Link></li>
             <li><Link href="/opportunities" className="hover:text-white transition">INSPIRE SHE (₹80k/yr)</Link></li>
-            <li><Link href="/opportunities" className="hover:text-white transition">PM Scholarship (PMSS)</Link></li>
-            <li><Link href="/internships" className="hover:text-white transition">RBI Summer Internship</Link></li>
-            <li><Link href="/internships" className="hover:text-white transition">NITI Aayog Policy Scheme</Link></li>
+            <li><Link href="/tools/salary-calculator" className="hover:text-white transition">7th CPC Salary Calculator</Link></li>
+            <li><Link href="/daily-gk" className="hover:text-white transition">Daily GK & Current Affairs</Link></li>
           </ul>
         </div>
 
         {/* Col 5: Platform & Verification */}
         <div className="space-y-3 col-span-2 md:col-span-1">
-          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Trust & Sources</h4>
+          <h4 className="font-bold text-slate-200 text-sm uppercase tracking-wider">Trust & Integrity</h4>
           <ul className="space-y-2">
+            <li><Link href="/tools/data-quality" className="hover:text-white transition font-semibold text-emerald-400">Data Quality & Audit</Link></li>
             <li><Link href="/admin/sources" className="hover:text-white transition">Official Sources Registry</Link></li>
             <li><Link href="/admin/review-queue" className="hover:text-white transition">Verifier Review Queue</Link></li>
             <li><Link href="/dashboard/profile" className="hover:text-white transition">Notification Settings</Link></li>

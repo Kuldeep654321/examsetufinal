@@ -27,7 +27,8 @@ import {
   Layers,
   Compass,
   Users,
-  Banknote
+  Banknote,
+  Building2
 } from 'lucide-react';
 import { StudentPersonalizer, ProfileFilterState, PRESET_PROFILES } from '@/components/home/StudentPersonalizer';
 import { ExamCard } from '@/components/exams/ExamCard';
@@ -191,63 +192,90 @@ export default function HomePage() {
           </Link>
         </section>
 
-        {/* STUDENT POWER TOOLS SHORTCUTS */}
-        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
+        {/* ADMISSION & COUNSELLING ECOSYSTEM HUBS */}
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-blue-600 block">
-                Student Utility Center
+                Admission & Counselling Radar
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                Essential Tools & Intelligence Resources
+                Complete Indian Higher Education Ecosystem
               </h2>
             </div>
+            <Link
+              href="/career-pathways"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 self-start sm:self-auto"
+            >
+              Explore Full Pathways <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Tool 1: 7th CPC Salary Calculator */}
+            {/* Hub 1: Counselling Systems */}
             <Link
-              href="/tools/salary-calculator"
-              className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
-            >
-              <div>
-                <span className="p-2 bg-emerald-600 text-white rounded-xl inline-block shadow-sm">
-                  <Banknote className="w-5 h-5" />
-                </span>
-                <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition mt-2">
-                  7th CPC Govt Salary Calculator
-                </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Calculate in-hand monthly salary with 50% DA, HRA (X/Y/Z), and NPS for any Pay Level.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1 pt-2">
-                Calculate Salary <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
-              </span>
-            </Link>
-
-            {/* Tool 2: Daily GK & Current Affairs */}
-            <Link
-              href="/daily-gk"
+              href="/counselling"
               className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50/50 border border-indigo-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
             >
               <div>
                 <span className="p-2 bg-indigo-600 text-white rounded-xl inline-block shadow-sm">
-                  <BookOpen className="w-5 h-5" />
+                  <Layers className="w-5 h-5" />
                 </span>
                 <h3 className="font-bold text-sm text-slate-900 group-hover:text-indigo-700 transition mt-2">
-                  Daily GK & Current Affairs
+                  Counselling Systems
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Bite-sized, syllabus-mapped general knowledge capsules for UPSC, SSC & Bank PO.
+                  JoSAA, CSAB, MCC Medical, AACCC, and CLAT multi-round seat allocation rules.
                 </p>
               </div>
               <span className="text-xs font-bold text-indigo-700 flex items-center gap-1 pt-2">
-                Read Daily Notes <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+                Explore Counselling <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
               </span>
             </Link>
 
-            {/* Tool 3: Career Pathways */}
+            {/* Hub 2: Colleges & Institutes */}
+            <Link
+              href="/institutions"
+              className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50/50 border border-blue-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-blue-600 text-white rounded-xl inline-block shadow-sm">
+                  <Building2 className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition mt-2">
+                  Colleges & Universities
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  23 IITs, 32 NITs, AIIMS, 24 NLUs, and Central Universities with recognized degrees.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-blue-700 flex items-center gap-1 pt-2">
+                Browse Institutes <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+
+            {/* Hub 3: Recognized Degrees & Courses */}
+            <Link
+              href="/courses"
+              className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
+            >
+              <div>
+                <span className="p-2 bg-emerald-600 text-white rounded-xl inline-block shadow-sm">
+                  <GraduationCap className="w-5 h-5" />
+                </span>
+                <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition mt-2">
+                  Recognized Degree Courses
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  B.Tech, MBBS, BDS, BAMS, B.Pharm, BA LLB, MBA, M.Tech, and Polytechnic Diplomas.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1 pt-2">
+                Browse Courses <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+              </span>
+            </Link>
+
+            {/* Hub 4: Student Pathways Engine */}
             <Link
               href="/career-pathways"
               className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50/50 border border-purple-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
@@ -257,35 +285,14 @@ export default function HomePage() {
                   <Compass className="w-5 h-5" />
                 </span>
                 <h3 className="font-bold text-sm text-slate-900 group-hover:text-purple-700 transition mt-2">
-                  Career Pathway Navigator
+                  Student Pathway Engine
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Interactive roadmap for what to do after 10th, 12th PCM/PCB/Commerce, or Degree.
+                  Interactive step-by-step roadmap after Class 10, 12th Streams, B.Tech, or Degree.
                 </p>
               </div>
               <span className="text-xs font-bold text-purple-700 flex items-center gap-1 pt-2">
-                Explore Pathways <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
-              </span>
-            </Link>
-
-            {/* Tool 4: Sarkari Job Directory */}
-            <Link
-              href="/jobs"
-              className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50/50 border border-blue-200 hover:shadow-md transition group space-y-2 flex flex-col justify-between"
-            >
-              <div>
-                <span className="p-2 bg-blue-600 text-white rounded-xl inline-block shadow-sm">
-                  <Briefcase className="w-5 h-5" />
-                </span>
-                <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition mt-2">
-                  Sarkari Naukri Radar
-                </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Active government recruitments filtered by qualification with official links.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-blue-700 flex items-center gap-1 pt-2">
-                Browse Vacancies <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
+                Launch Pathways <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition" />
               </span>
             </Link>
           </div>

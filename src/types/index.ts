@@ -426,3 +426,162 @@ export interface FilterState {
   query?: string;
   level?: string;
 }
+
+export interface Board {
+  id: string;
+  name: string;
+  short_name: string;
+  slug: string;
+  board_type: 'central' | 'state' | 'open';
+  state_id?: string;
+  state_name?: string;
+  official_website: string;
+  official_domain: string;
+  classes_covered: string[];
+  grading_system?: string;
+  supplementary_exam_name?: string;
+  revaluation_process_info?: string;
+  pattern_summary?: string;
+  practical_exam_info?: string;
+  helpline_number?: string;
+  is_verified: boolean;
+  last_verified_at: string;
+  created_at: string;
+}
+
+export interface CounsellingAuthority {
+  id: string;
+  name: string;
+  short_name: string;
+  slug: string;
+  stream: string;
+  jurisdiction: string;
+  conducting_body: string;
+  official_website: string;
+  official_domain: string;
+  description: string;
+  helpline_number?: string;
+  contact_email?: string;
+  is_verified: boolean;
+  last_verified_at: string;
+  created_at: string;
+  processes?: CounsellingProcess[];
+}
+
+export interface CounsellingRound {
+  round_number: number;
+  name: string; // e.g. "Round 1 (All India)", "Round 2", "Round 3 (Mop-Up)", "Stray Vacancy Round"
+  description: string;
+  status: 'announced' | 'unannounced' | 'open' | 'completed';
+  start_date?: string | null;
+  end_date?: string | null;
+  rules_summary: string;
+}
+
+export interface CounsellingStep {
+  step: number;
+  title: string;
+  description: string;
+  action_required: string;
+}
+
+export interface CounsellingProcess {
+  id: string;
+  authority_id: string;
+  authority?: CounsellingAuthority;
+  exam_id?: string;
+  exam?: Exam;
+  cycle_year: number;
+  title: string;
+  slug: string;
+  official_portal_url: string;
+  notification_url?: string;
+  process_overview: string;
+  eligibility_summary: string;
+  reservation_summary?: string;
+  rounds_structure: CounsellingRound[];
+  step_by_step_process: CounsellingStep[];
+  required_documents: string[];
+  seat_matrix_info?: string;
+  fees_info?: string;
+  status: string;
+  last_verified_at: string;
+  created_at: string;
+}
+
+export interface Institution {
+  id: string;
+  name: string;
+  short_name: string;
+  slug: string;
+  institution_type:
+    | 'IIT'
+    | 'NIT'
+    | 'IIIT'
+    | 'AIIMS'
+    | 'IIM'
+    | 'NLU'
+    | 'Central_University'
+    | 'State_University'
+    | 'Govt_Medical_College'
+    | 'Govt_Engineering_College'
+    | 'Institute_of_National_Importance';
+  state_id?: string;
+  state_name: string;
+  city: string;
+  official_website: string;
+  affiliation?: string;
+  recognized_by?: string;
+  accepted_exams: string[];
+  counselling_authorities: string[];
+  courses_offered: string[];
+  campus_overview?: string;
+  is_verified: boolean;
+  last_verified_at: string;
+  created_at: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  short_name: string;
+  slug: string;
+  degree_level: 'UG' | 'PG' | 'Diploma' | 'Doctorate' | 'Integrated' | 'Certificate';
+  stream: string;
+  duration_years: number;
+  eligibility_summary: string;
+  stream_prerequisites: string[];
+  lateral_entry_available: boolean;
+  regulatory_body?: string;
+  accepted_entrance_exams: string[];
+  counselling_routes: string[];
+  career_scope: string;
+  top_specializations: string[];
+  is_verified: boolean;
+  last_verified_at: string;
+  created_at: string;
+}
+
+export interface StudentPathway {
+  id: string;
+  stage_from: string;
+  title: string;
+  slug: string;
+  category: string;
+  summary: string;
+  flow_stages: {
+    level: string;
+    step_title: string;
+    description: string;
+    options: string[];
+  }[];
+  entrance_exams: string[];
+  counselling_systems: string[];
+  courses_accessible: string[];
+  institutions_types: string[];
+  career_outcomes: string[];
+  govt_exam_eligibility: string[];
+  is_verified: boolean;
+  last_verified_at: string;
+  created_at: string;
+}
