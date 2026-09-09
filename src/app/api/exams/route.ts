@@ -59,10 +59,27 @@ export async function GET(req: NextRequest) {
                 'end_date', ev.end_date,
                 'is_extended', ev.is_extended,
                 'previous_end_date', ev.previous_end_date,
-                'status', ev.status,
+                'status', (
+                  CASE
+                    WHEN ev.status = 'unannounced' OR (ev.start_date IS NULL AND ev.end_date IS NULL) THEN 'unannounced'
+                    WHEN ev.status = 'delayed' THEN 'delayed'
+                    WHEN ev.end_date IS NOT NULL AND CURRENT_DATE > ev.end_date THEN 'completed'
+                    WHEN ev.end_date IS NOT NULL AND CURRENT_DATE >= ev.end_date - INTERVAL '3 days' AND CURRENT_DATE <= ev.end_date THEN 'closing_soon'
+                    WHEN (ev.start_date IS NOT NULL AND CURRENT_DATE >= ev.start_date AND (ev.end_date IS NULL OR CURRENT_DATE <= ev.end_date)) THEN 'open'
+                    WHEN ev.start_date IS NOT NULL AND CURRENT_DATE < ev.start_date THEN 'upcoming'
+                    ELSE ev.status
+                  END
+                ),
                 'official_source_url', ev.official_source_url,
                 'notes', ev.notes
-              ) ORDER BY ev.start_date ASC NULLS LAST
+              ) ORDER BY
+                (CASE
+                  WHEN ev.start_date IS NOT NULL AND CURRENT_DATE >= ev.start_date AND (ev.end_date IS NULL OR CURRENT_DATE <= ev.end_date) THEN 1
+                  WHEN ev.end_date IS NOT NULL AND CURRENT_DATE >= ev.end_date - INTERVAL '3 days' AND CURRENT_DATE <= ev.end_date THEN 1
+                  WHEN ev.start_date IS NOT NULL AND CURRENT_DATE < ev.start_date THEN 2
+                  ELSE 3
+                END),
+                ev.start_date ASC NULLS LAST
             )
             FROM exam_events ev
             WHERE ev.exam_id = e.id

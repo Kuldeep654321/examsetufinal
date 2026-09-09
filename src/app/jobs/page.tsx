@@ -55,7 +55,15 @@ async function getJobVacancies() {
       opp.official_source_url,
       opp.official_portal_link,
       opp.documents_required,
-      opp.status,
+      (
+        CASE
+          WHEN opp.application_deadline IS NOT NULL AND CURRENT_DATE > opp.application_deadline THEN 'closed'::opp_status
+          WHEN opp.application_deadline IS NOT NULL AND CURRENT_DATE >= opp.application_deadline - INTERVAL '3 days' AND CURRENT_DATE <= opp.application_deadline THEN 'closing_soon'::opp_status
+          WHEN (opp.application_start IS NOT NULL AND CURRENT_DATE >= opp.application_start AND (opp.application_deadline IS NULL OR CURRENT_DATE <= opp.application_deadline)) THEN 'open'::opp_status
+          WHEN opp.application_start IS NOT NULL AND CURRENT_DATE < opp.application_start THEN 'upcoming'::opp_status
+          ELSE opp.status
+        END
+      ) as status,
       opp.last_verified_at,
       opp.is_featured,
       opp.created_at,

@@ -130,7 +130,7 @@ export class AIExtractionEngine {
     let startDate: string | null = null;
     let endDate: string | null = null;
 
-    const rangeMatch = fullText.match(/(?:from|w\.e\.f\.?)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})\s+(?:to|till|upto|up to)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i);
+    const rangeMatch = fullText.match(/(?:from|opens|w\.e\.f\.?)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})\s+(?:to|till|upto|up to|and closes)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i);
     if (rangeMatch) {
       startDate = this.parseIndianDate(rangeMatch[1]);
       endDate = this.parseIndianDate(rangeMatch[2]);
@@ -138,7 +138,7 @@ export class AIExtractionEngine {
 
     // Single deadline pattern: "up to 16 March 2027" / "last date is 16.03.2027"
     if (!endDate) {
-      const deadlineMatch = fullText.match(/(?:up to|upto|last date|deadline|extended to|till)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i);
+      const deadlineMatch = fullText.match(/(?:up to|upto|last date|deadline|extended to|till|closes)\s+([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+,?\s+[0-9]{4}|[0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i);
       if (deadlineMatch) {
         endDate = this.parseIndianDate(deadlineMatch[1]);
       }
@@ -154,6 +154,10 @@ export class AIExtractionEngine {
     // Determine target exam slug
     let targetExamSlug = '';
     if (/neet/i.test(fullText)) targetExamSlug = 'neet-ug-2027';
+    else if (/gate/i.test(fullText)) targetExamSlug = 'gate-2027';
+    else if (/rrb|railway/i.test(fullText)) targetExamSlug = 'rrb-ntpc-2027';
+    else if (/sbi/i.test(fullText)) targetExamSlug = 'sbi-po-2027';
+    else if (/rbi/i.test(fullText)) targetExamSlug = 'rbi-grade-b-2027';
     else if (/jee\s*(?:main)?/i.test(fullText)) targetExamSlug = 'jee-main-2027';
     else if (/upsc|civil services/i.test(fullText)) targetExamSlug = 'upsc-cse-2027';
     else if (/ssc|cgl/i.test(fullText)) targetExamSlug = 'ssc-cgl-2027';

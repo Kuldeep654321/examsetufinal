@@ -77,12 +77,31 @@ export async function GET(
 
     const exam = examRes.rows[0];
 
-    // Fetch Events
+    // Fetch Events with dynamic status calculation
     const eventsRes = await query(
-      `SELECT id, cycle_year, event_type, title, start_date, end_date, is_extended, previous_end_date, status, official_source_url, notification_doc_url, notes, last_verified_at
+      `SELECT
+        id, cycle_year, event_type, title, start_date, end_date, is_extended, previous_end_date,
+        (
+          CASE
+            WHEN status = 'unannounced' OR (start_date IS NULL AND end_date IS NULL) THEN 'unannounced'::event_status
+            WHEN status = 'delayed' THEN 'delayed'::event_status
+            WHEN end_date IS NOT NULL AND CURRENT_DATE > end_date THEN 'completed'::event_status
+            WHEN end_date IS NOT NULL AND CURRENT_DATE >= end_date - INTERVAL '3 days' AND CURRENT_DATE <= end_date THEN 'closing_soon'::event_status
+            WHEN (start_date IS NOT NULL AND CURRENT_DATE >= start_date AND (end_date IS NULL OR CURRENT_DATE <= end_date)) THEN 'open'::event_status
+            WHEN start_date IS NOT NULL AND CURRENT_DATE < start_date THEN 'upcoming'::event_status
+            ELSE status
+          END
+        ) as status,
+        official_source_url, notification_doc_url, notes, last_verified_at
        FROM exam_events
        WHERE exam_id = $1
-       ORDER BY start_date ASC NULLS LAST`,
+       ORDER BY
+         (CASE
+           WHEN start_date IS NOT NULL AND CURRENT_DATE >= start_date AND (end_date IS NULL OR CURRENT_DATE <= end_date) THEN 1
+           WHEN start_date IS NOT NULL AND CURRENT_DATE < start_date THEN 2
+           ELSE 3
+         END),
+         start_date ASC NULLS LAST`,
       [exam.id]
     );
 
