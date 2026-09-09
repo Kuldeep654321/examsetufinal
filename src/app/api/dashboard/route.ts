@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { query } from '@/lib/db';
+import { filterExamsForProfile, filterOpportunitiesForProfile } from '@/lib/recommendation-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,11 +15,11 @@ export async function GET(req: NextRequest) {
     // 1. Fetch User Profile
     const profileRes = await query('SELECT * FROM profiles WHERE user_id = $1', [user.id]);
     const profile = profileRes.rows[0] || {
-      class_level: '12',
-      board: 'CBSE',
+      class_level: 'BTech_Final',
+      board: 'Autonomous University / AICTE',
       state: 'Madhya Pradesh',
-      stream: 'PCB',
-      target_exams: ['NEET UG', 'CUET UG'],
+      stream: 'Engineering',
+      target_exams: ['GATE', 'CAT', 'SSC CGL', 'UPSC CSE', 'ISRO'],
     };
 
     // 2. Fetch Today's / Recent Verified Updates
@@ -67,29 +68,40 @@ export async function GET(req: NextRequest) {
       LIMIT 8
     `);
 
-    // 4. Fetch Recommended Opportunities matching stream/qualification
-    const userStream = profile.stream || 'PCB';
-    const oppsRes = await query(
-      `SELECT
-        opp.id,
-        opp.slug,
-        opp.title,
-        opp.opp_type,
-        opp.qualification,
-        opp.benefits,
-        opp.financial_aid_amount,
-        opp.application_deadline,
-        opp.is_deadline_extended,
-        opp.status,
-        opp.official_source_url,
-        o.name as org_name,
-        o.short_name as org_short_name
+    // 4. Fetch All Active Exams & Opportunities for Intelligent Profile Matching
+    const allExamsRes = await query(`
+      SELECT
+        e.id, e.slug, e.title, e.short_title, e.conducting_org_id, e.category_id,
+        e.level, e.stream_eligibility, e.min_age, e.max_age, e.eligibility_criteria,
+        e.exam_frequency, e.official_website_url, e.registration_url, e.syllabus_url,
+        e.exam_pattern, e.important_documents, e.faqs, e.is_featured, e.is_active,
+        e.last_verified_at, o.name as org_name, o.short_name as org_short_name, o.official_domain
+      FROM exams e
+      JOIN organizations o ON e.conducting_org_id = o.id
+      WHERE e.is_active = true
+      ORDER BY e.is_featured DESC, e.title ASC
+    `);
+
+    const allOppsRes = await query(`
+      SELECT
+        opp.id, opp.slug, opp.title, opp.opp_type, opp.qualification, opp.eligibility,
+        opp.benefits, opp.financial_aid_amount, opp.application_deadline, opp.is_deadline_extended,
+        opp.status, opp.official_source_url, opp.official_portal_link,
+        o.name as org_name, o.short_name as org_short_name
       FROM opportunities opp
       JOIN organizations o ON opp.org_id = o.id
-      WHERE opp.status IN ('open', 'closing_soon', 'announced')
+      WHERE opp.status IN ('open', 'closing_soon', 'announced', 'upcoming')
       ORDER BY opp.is_featured DESC, opp.application_deadline ASC NULLS LAST
-      LIMIT 6`
-    );
+    `);
+
+    const profileContext = {
+      classLevel: profile.class_level || 'BTech_Final',
+      stream: profile.stream || 'Engineering',
+      targetCategory: profile.target_category || 'All',
+    };
+
+    const recommendedExams = filterExamsForProfile(allExamsRes.rows, profileContext);
+    const recommendedOpps = filterOpportunitiesForProfile(allOppsRes.rows, profileContext);
 
     // 5. Fetch Student's Application Tracker Items
     const trackerRes = await query(
@@ -150,7 +162,8 @@ export async function GET(req: NextRequest) {
         profile,
         updates: updatesRes.rows,
         deadlines: deadlinesRes.rows,
-        recommendations: oppsRes.rows,
+        recommendedExams,
+        recommendations: recommendedOpps,
         tracker: trackerRes.rows,
         savedExams: savedExamsRes.rows,
         savedOpportunities: savedOppsRes.rows,

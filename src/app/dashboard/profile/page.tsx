@@ -14,7 +14,8 @@ import {
   Save,
   ShieldCheck,
   Sparkles,
-  Layers
+  Layers,
+  GraduationCap
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -22,12 +23,12 @@ export default function ProfilePage() {
   const { user, refreshUser, loading: authLoading } = useAuth();
 
   const [fullName, setFullName] = useState('');
-  const [classLevel, setClassLevel] = useState('12');
-  const [board, setBoard] = useState('CBSE');
+  const [classLevel, setClassLevel] = useState('BTech_Final');
+  const [board, setBoard] = useState('Autonomous University / AICTE');
   const [state, setState] = useState('Madhya Pradesh');
-  const [stream, setStream] = useState('PCB');
-  const [targetExams, setTargetExams] = useState<string[]>(['NEET UG', 'CUET UG']);
-  const [careerInterests, setCareerInterests] = useState<string[]>(['Medicine', 'Biotechnology']);
+  const [stream, setStream] = useState('Engineering');
+  const [targetExams, setTargetExams] = useState<string[]>(['GATE', 'CAT', 'SSC CGL', 'UPSC CSE', 'ISRO']);
+  const [careerInterests, setCareerInterests] = useState<string[]>(['M.Tech / Higher Studies', 'PSU Jobs', 'Civil Services', 'MBA']);
   const [phone, setPhone] = useState('');
 
   // Notification Preferences
@@ -127,6 +128,20 @@ export default function ProfilePage() {
     }
   };
 
+  // Dynamic exam chips based on selected education level
+  const availableExamChips =
+    classLevel === 'BTech_Final' || classLevel === 'Graduate'
+      ? ['GATE', 'CAT (IIM)', 'SSC CGL', 'SSC JE', 'UPSC CSE', 'IBPS PO', 'UPSC CDS', 'MPPSC SSE', 'NITI Aayog Internship', 'ISRO ICRB']
+      : classLevel === '10'
+      ? ['CBSE Class 10', 'MP Board 10th', 'Polytechnic Diploma Entrance', 'NTSE', 'SSC MTS']
+      : stream === 'PCB'
+      ? ['NEET UG', 'CUET UG (Bio)', 'AIIMS B.Sc Nursing', 'AACCC AYUSH', 'PM-USP Scholarship', 'CBSE Class 12', 'MP Board 12th']
+      : stream === 'PCM'
+      ? ['JEE Main', 'JEE Advanced', 'UPSC NDA', 'CUET UG', 'NATA', 'CBSE Class 12', 'MP Board 12th', 'INSPIRE SHE']
+      : stream === 'Commerce'
+      ? ['CUET UG (Commerce)', 'CLAT UG', 'CA Foundation', 'IPMAT', 'CBSE Class 12', 'MP Board 12th', 'SSC CHSL']
+      : ['CLAT UG', 'CUET UG (Arts)', 'AILET', 'NID DAT', 'CBSE Class 12', 'MP Board 12th', 'SSC CHSL'];
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
@@ -143,14 +158,14 @@ export default function ProfilePage() {
           Profile &amp; Intelligence Preferences
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Fine-tune your target examinations, academic streams, and alert channels for personalized recommendations
+          Fine-tune your current academic level and target examinations for personalized home and dashboard recommendations
         </p>
       </div>
 
       {savedSuccess && (
-        <div className="p-4 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-2xl border border-emerald-200 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>Profile preferences saved successfully! Dashboard feed has been updated.</span>
+        <div className="p-4 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-2xl border border-emerald-200 flex items-center gap-2 shadow-sm">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+          <span>Profile saved! Homepage and Dashboard intelligence feeds are now customized for your academic stage.</span>
         </div>
       )}
 
@@ -205,56 +220,55 @@ export default function ProfilePage() {
         {/* Academic Profile */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
-            <BookOpen className="w-4 h-4 text-blue-600" /> Academic Profile &amp; Stream Focus
+            <BookOpen className="w-4 h-4 text-blue-600" /> Current Academic Stage &amp; Stream Focus
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-700 font-bold mb-1">Current Class / Level</label>
+              <label className="block text-slate-700 font-bold mb-1">Current Academic Level</label>
               <select
                 value={classLevel}
                 onChange={(e) => setClassLevel(e.target.value)}
-                className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"
+                className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold"
               >
-                <option value="10">Class 10th</option>
-                <option value="12">Class 12th</option>
-                <option value="Undergraduate">Undergraduate (B.Sc / B.Tech / B.Com / B.A)</option>
-                <option value="Graduate">Graduate / Degree Holder</option>
+                <option value="BTech_Final">⚙️ B.Tech (4th Year / Final Year / Graduate)</option>
+                <option value="Graduate">🎓 Graduate / Final Year (B.A., B.Sc., B.Com., BBA)</option>
+                <option value="12">🏫 Class 12th (Senior Secondary)</option>
+                <option value="Polytechnic">🔧 3-Year Polytechnic Diploma</option>
+                <option value="10">🎒 Class 10th (Secondary School)</option>
+                <option value="Postgraduate">🏛️ Postgraduate (Master&apos;s / Ph.D.)</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-slate-700 font-bold mb-1">Stream</label>
+              <label className="block text-slate-700 font-bold mb-1">Stream / Discipline</label>
               <select
                 value={stream}
                 onChange={(e) => setStream(e.target.value)}
-                className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"
+                className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold"
               >
-                <option value="PCB">PCB (Physics, Chemistry, Biology)</option>
+                <option value="Engineering">Engineering / Technology (CSE, ME, EE, Civil, ECE, IT)</option>
                 <option value="PCM">PCM (Physics, Chemistry, Mathematics)</option>
-                <option value="Commerce">Commerce / Accountancy</option>
+                <option value="PCB">PCB (Physics, Chemistry, Biology)</option>
+                <option value="Commerce">Commerce / Accountancy / Economics</option>
                 <option value="Arts/Humanities">Arts / Humanities / Social Sciences</option>
-                <option value="General">General / All-Stream</option>
+                <option value="Any">General / Any Graduate Discipline</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-slate-700 font-bold mb-1">Board of Examination</label>
-              <select
+              <label className="block text-slate-700 font-bold mb-1">University / Board / Institution</label>
+              <input
+                type="text"
                 value={board}
                 onChange={(e) => setBoard(e.target.value)}
+                placeholder="e.g. AICTE / Autonomous College / CBSE / MPBSE"
                 className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800"
-              >
-                <option value="CBSE">CBSE (Central Board)</option>
-                <option value="MPBSE">MP Board (MPBSE)</option>
-                <option value="ICSE">ICSE / ISC</option>
-                <option value="State Board">State Board (UPMSP, BSEB, etc.)</option>
-                <option value="NIOS">NIOS Open School</option>
-              </select>
+              />
             </div>
 
             <div>
-              <label className="block text-slate-700 font-bold mb-1">State / Region Domicile</label>
+              <label className="block text-slate-700 font-bold mb-1">State Domicile</label>
               <select
                 value={state}
                 onChange={(e) => setState(e.target.value)}
@@ -275,21 +289,11 @@ export default function ProfilePage() {
 
           {/* Target Exams Multi-Select Chips */}
           <div className="pt-2">
-            <label className="block text-slate-700 font-bold mb-2">Target Examinations (Click to toggle)</label>
+            <label className="block text-slate-700 font-bold mb-2">
+              Target Examinations (Tailored for {classLevel === 'BTech_Final' ? 'B.Tech / Graduate' : classLevel})
+            </label>
             <div className="flex flex-wrap gap-2">
-              {[
-                'NEET UG',
-                'JEE Main',
-                'CUET UG',
-                'UPSC CSE',
-                'SSC CGL',
-                'MP Board 12th',
-                'CBSE Class 12',
-                'CLAT UG',
-                'CAT IIM',
-                'IBPS PO',
-                'NSP Scholarship',
-              ].map((exam) => {
+              {availableExamChips.map((exam) => {
                 const isSelected = targetExams.includes(exam);
                 return (
                   <button

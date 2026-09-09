@@ -187,22 +187,21 @@ export default async function BoardsDirectoryPage({
 
             {/* Footer */}
             <div className="px-6 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs">
-              {b.helpline_number ? (
-                <span className="text-slate-500 font-semibold flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-blue-600" /> {b.helpline_number}
-                </span>
-              ) : (
-                <span className="text-slate-400">Official Portal</span>
-              )}
-
               <a
                 href={b.official_website}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+              >
+                Official Portal <ExternalLink className="w-3 h-3" />
+              </a>
+
+              <Link
+                href={`/boards/${b.slug}`}
                 className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                Board Website <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+                Board Details <ArrowRight className="w-3.5 h-3.5 transition group-hover:translate-x-1" />
+              </Link>
             </div>
           </div>
         ))}

@@ -30,22 +30,25 @@ import {
   Banknote,
   Building2
 } from 'lucide-react';
+import { useAuth } from '@/components/layout/AuthContext';
 import { StudentPersonalizer, ProfileFilterState, PRESET_PROFILES } from '@/components/home/StudentPersonalizer';
+import { filterExamsForProfile, filterOpportunitiesForProfile } from '@/lib/recommendation-engine';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { OppCard } from '@/components/opportunities/OppCard';
 import { Exam, Opportunity } from '@/types';
 
 export default function HomePage() {
+  const { user } = useAuth();
   const [exams, setExams] = useState<Exam[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Active student profile state
+  // Active student profile state (Default: B.Tech 4th Year / Engineering Graduate or user profile)
   const [profile, setProfile] = useState<ProfileFilterState>({
-    classLevel: '12',
-    stream: 'PCB',
-    targetCategory: 'Medical Entrance',
-    presetKey: '12-pcb',
+    classLevel: 'BTech_Final',
+    stream: 'Engineering',
+    targetCategory: 'Engineering & Post-Graduation',
+    presetKey: 'btech-4th-year',
   });
 
   // Suggestion Active Tab
@@ -55,8 +58,8 @@ export default function HomePage() {
     async function loadData() {
       try {
         const [examsRes, oppsRes] = await Promise.all([
-          fetch('/api/exams?limit=30'),
-          fetch('/api/opportunities?limit=30'),
+          fetch('/api/exams?limit=40'),
+          fetch('/api/opportunities?limit=40'),
         ]);
 
         if (examsRes.ok) {
@@ -78,23 +81,62 @@ export default function HomePage() {
     loadData();
   }, []);
 
+  // Initialize from localStorage on client mount if available
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('examsetu_preset');
+      if (saved) {
+        const found = PRESET_PROFILES.find((p) => p.id === saved);
+        if (found) {
+          setProfile({
+            classLevel: found.classLevel,
+            stream: found.stream,
+            discipline: found.discipline,
+            targetCategory: found.targetCategory,
+            presetKey: found.id,
+          });
+        }
+      }
+    }
+  }, []);
+
+  // Update profile if logged in user has specific profile settings
+  useEffect(() => {
+    if (user && (user as any).profile) {
+      const up = (user as any).profile;
+      const matchedPreset = PRESET_PROFILES.find(
+        (p) => p.classLevel === up.class_level || (p.stream === up.stream && p.classLevel === up.class_level)
+      );
+
+      setProfile({
+        classLevel: up.class_level || 'BTech_Final',
+        stream: up.stream || 'Engineering',
+        targetCategory: up.target_category || 'All',
+        presetKey: matchedPreset ? matchedPreset.id : 'custom',
+      });
+    }
+  }, [user]);
+
   const handleProfileChange = (newProfile: ProfileFilterState) => {
     setProfile(newProfile);
   };
 
-  // Filter exams matching student stream
-  const matchingExams = exams.filter((e) => {
-    if (!profile.stream || profile.stream === 'Any') return true;
-    return (
-      e.stream_eligibility?.includes(profile.stream) ||
-      e.stream_eligibility?.includes('Any')
-    );
+  // Filter exams strictly tailored for current student stage
+  const matchingExams = filterExamsForProfile(exams, {
+    classLevel: profile.classLevel,
+    stream: profile.stream,
+    targetCategory: profile.targetCategory,
   });
 
   // Filter matching opportunities
-  const matchingJobs = opportunities.filter((o) => o.opp_type === 'job');
-  const matchingScholarships = opportunities.filter((o) => o.opp_type === 'scholarship');
-  const matchingInternships = opportunities.filter((o) => o.opp_type === 'internship');
+  const filteredOpps = filterOpportunitiesForProfile(opportunities, {
+    classLevel: profile.classLevel,
+    stream: profile.stream,
+  });
+
+  const matchingJobs = filteredOpps.filter((o) => o.opp_type === 'job');
+  const matchingScholarships = filteredOpps.filter((o) => o.opp_type === 'scholarship');
+  const matchingInternships = filteredOpps.filter((o) => o.opp_type === 'internship');
 
   return (
     <div className="space-y-12 pb-16">
@@ -176,16 +218,16 @@ export default function HomePage() {
                 <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-blue-100 text-blue-900 rounded">
                   Live Active Notification
                 </span>
-                <span className="text-xs text-slate-500 font-semibold">Consortium of NLUs • Official Circular</span>
+                <span className="text-xs text-slate-500 font-semibold">Staff Selection Commission • Official Notice</span>
               </div>
               <p className="text-sm font-bold text-slate-900 mt-0.5">
-                CLAT 2027: Online Registration Active on consortiumofnlus.ac.in (Apply before 31 Oct 2026) • Exam on 6 Dec 2026
+                SSC CHSL 2026: Online Applications Open (07 Sept to 07 Oct 2026) • SSC CGL 2026 Tier-1 CBT Ongoing
               </p>
             </div>
           </div>
 
           <Link
-            href="/exams/clat-ug-2027"
+            href="/exams/ssc-chsl-2026"
             className="text-xs font-bold px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-900 rounded-xl shadow-sm border border-slate-200 transition shrink-0 flex items-center gap-1.5"
           >
             View Official Schedule <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
@@ -197,7 +239,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-blue-600 block">
-                Admission & Counselling Radar
+                Admission &amp; Counselling Radar
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                 Complete Indian Higher Education Ecosystem
@@ -243,7 +285,7 @@ export default function HomePage() {
                   <Building2 className="w-5 h-5" />
                 </span>
                 <h3 className="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition mt-2">
-                  Colleges & Universities
+                  Colleges &amp; Universities
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
                   23 IITs, 32 NITs, AIIMS, 24 NLUs, and Central Universities with recognized degrees.
@@ -304,11 +346,11 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs font-black uppercase tracking-wider text-blue-600">
-                  Profile Tailored Intelligence ({profile.stream} • {profile.classLevel === '10' || profile.classLevel === '12' ? `Class ${profile.classLevel}th` : profile.classLevel})
+                  Target Suggestions for: {profile.classLevel === 'BTech_Final' ? 'B.Tech 4th Year / Engineering Graduate' : profile.classLevel === '10' || profile.classLevel === '12' ? `Class ${profile.classLevel}th (${profile.stream})` : `${profile.classLevel} (${profile.stream})`}
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-                Recommended Opportunities For Your Profile
+                Recommended Opportunities After Your Current Stage
               </h2>
             </div>
 
@@ -367,18 +409,27 @@ export default function HomePage() {
           {/* Tab 1: Exams */}
           {activeTab === 'exams' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matchingExams.slice(0, 6).map((exam) => (
-                  <ExamCard key={exam.id} exam={exam} />
-                ))}
-              </div>
+              {matchingExams.length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-3xl border border-slate-200 text-slate-500">
+                  <p className="font-semibold text-sm">No specific examinations match this exact profile filter.</p>
+                  <Link href="/exams" className="text-xs font-bold text-blue-600 hover:underline mt-2 inline-block">
+                    Browse All Examinations
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {matchingExams.slice(0, 9).map((exam) => (
+                    <ExamCard key={exam.id} exam={exam} />
+                  ))}
+                </div>
+              )}
 
               <div className="text-center pt-4">
                 <Link
                   href="/exams"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-2xl transition border border-blue-200 text-xs"
                 >
-                  View All 40+ Indian Examinations <ChevronRight className="w-4 h-4" />
+                  View All Indian Examinations <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -387,11 +438,17 @@ export default function HomePage() {
           {/* Tab 2: Govt Jobs */}
           {activeTab === 'jobs' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matchingJobs.slice(0, 6).map((opp) => (
-                  <OppCard key={opp.id} opp={opp} />
-                ))}
-              </div>
+              {matchingJobs.length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-3xl border border-slate-200 text-slate-500">
+                  <p className="font-semibold text-sm">No active job notifications currently open for this specific filter.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {matchingJobs.slice(0, 6).map((opp) => (
+                    <OppCard key={opp.id} opp={opp} />
+                  ))}
+                </div>
+              )}
 
               <div className="text-center pt-4">
                 <Link
@@ -407,18 +464,24 @@ export default function HomePage() {
           {/* Tab 3: Scholarships */}
           {activeTab === 'scholarships' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matchingScholarships.slice(0, 6).map((opp) => (
-                  <OppCard key={opp.id} opp={opp} />
-                ))}
-              </div>
+              {matchingScholarships.length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-3xl border border-slate-200 text-slate-500">
+                  <p className="font-semibold text-sm">No specific scholarship programs listed for this profile level.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {matchingScholarships.slice(0, 6).map((opp) => (
+                    <OppCard key={opp.id} opp={opp} />
+                  ))}
+                </div>
+              )}
 
               <div className="text-center pt-4">
                 <Link
                   href="/opportunities"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold rounded-2xl transition border border-amber-200 text-xs"
                 >
-                  View All National Scholarships & Financial Aid <ChevronRight className="w-4 h-4" />
+                  View All National Scholarships &amp; Financial Aid <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -427,18 +490,24 @@ export default function HomePage() {
           {/* Tab 4: Internships */}
           {activeTab === 'internships' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matchingInternships.slice(0, 6).map((opp) => (
-                  <OppCard key={opp.id} opp={opp} />
-                ))}
-              </div>
+              {matchingInternships.length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-3xl border border-slate-200 text-slate-500">
+                  <p className="font-semibold text-sm">No internships currently listed for this category.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {matchingInternships.slice(0, 6).map((opp) => (
+                    <OppCard key={opp.id} opp={opp} />
+                  ))}
+                </div>
+              )}
 
               <div className="text-center pt-4">
                 <Link
                   href="/internships"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold rounded-2xl transition border border-purple-200 text-xs"
                 >
-                  View All Government & Research Internships <ChevronRight className="w-4 h-4" />
+                  View All Government &amp; Research Internships <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>

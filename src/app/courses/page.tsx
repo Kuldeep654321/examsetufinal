@@ -219,10 +219,10 @@ export default async function CoursesDirectoryPage({
               </span>
 
               <Link
-                href={`/career-pathways?q=${encodeURIComponent(cr.short_name)}`}
+                href={`/courses/${cr.slug}`}
                 className="font-black text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
               >
-                View Pathways <ArrowRight className="w-3.5 h-3.5 transition group-hover:translate-x-1" />
+                Course Details <ArrowRight className="w-3.5 h-3.5 transition group-hover:translate-x-1" />
               </Link>
             </div>
           </div>

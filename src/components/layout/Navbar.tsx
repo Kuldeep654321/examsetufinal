@@ -59,11 +59,11 @@ export function Navbar() {
         <div className="bg-slate-900 text-white text-[11px] font-medium py-1 px-4 sm:px-8 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Live Official Update Engine: 100% Verified Indian Exam & Job Intelligence</span>
+            <span>Official Source Intelligence: Direct Primary Source Data from NTA, UPSC, SSC, CBSE & State Authorities</span>
           </div>
           <div className="hidden sm:flex items-center space-x-4 text-slate-300">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> NTA • UPSC • SSC • CBSE • IBPS
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Primary Gazette Provenance
             </span>
             <span>•</span>
             <span>examsetu.in</span>

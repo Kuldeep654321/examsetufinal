@@ -19,7 +19,10 @@ import {
   ChevronRight,
   Award,
   ExternalLink,
-  Plus
+  Plus,
+  Compass,
+  GraduationCap,
+  Briefcase
 } from 'lucide-react';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { OppCard } from '@/components/opportunities/OppCard';
@@ -61,8 +64,16 @@ export default function StudentDashboardPage() {
   const profile = dashboardData?.profile || {};
   const updates = dashboardData?.updates || [];
   const deadlines = dashboardData?.deadlines || [];
+  const recommendedExams = dashboardData?.recommendedExams || [];
   const recommendations = dashboardData?.recommendations || [];
   const trackerItems = dashboardData?.tracker || [];
+
+  const profileDisplay =
+    profile.class_level === 'BTech_Final'
+      ? 'B.Tech (4th / Final Year)'
+      : profile.class_level === '10' || profile.class_level === '12'
+      ? `Class ${profile.class_level}th`
+      : profile.class_level || 'B.Tech 4th Year';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -78,27 +89,61 @@ export default function StudentDashboardPage() {
               Namaste, {user?.full_name}!
             </h1>
             <p className="text-xs text-slate-300 mt-0.5">
-              Profile: Class {profile.class_level || '12'} • Stream: {profile.stream || 'PCB'} • State: {profile.state || 'Madhya Pradesh'}
+              Academic Stage: <strong>{profileDisplay}</strong> • Stream: <strong>{profile.stream || 'Engineering'}</strong> • State: <strong>{profile.state || 'Madhya Pradesh'}</strong>
             </p>
           </div>
 
           {/* Quick Dashboard Action Badges */}
           <div className="flex flex-wrap items-center gap-2">
             <Link
+              href="/dashboard/profile"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/20 transition flex items-center gap-1.5"
+            >
+              <GraduationCap className="w-4 h-4 text-emerald-400" /> Edit Academic Stage
+            </Link>
+            <Link
               href="/dashboard/tracker"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5"
             >
               <FileCheck2 className="w-4 h-4" /> Application Tracker ({trackerItems.length})
             </Link>
-            <Link
-              href="/dashboard/saved"
-              className="px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl border border-white/20 transition flex items-center gap-1.5"
-            >
-              <Bookmark className="w-4 h-4" /> Saved Items
-            </Link>
           </div>
         </div>
       </div>
+
+      {/* Recommended Examinations for Your Specific Profile */}
+      <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-black uppercase tracking-wider text-blue-600">
+                Tailored Examination Feed for {profileDisplay}
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+              Recommended Target Exams After Your Current Stage
+            </h2>
+          </div>
+          <Link
+            href="/career-pathways"
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          >
+            View Career Roadmap <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {recommendedExams.length === 0 ? (
+          <div className="p-6 text-center text-slate-500 text-xs">
+            No specific examinations found matching this exact filter.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recommendedExams.slice(0, 6).map((exam: any) => (
+              <ExamCard key={exam.id} exam={exam} />
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Critical Upcoming Deadlines Banner */}
       <section className="space-y-4">
@@ -178,11 +223,11 @@ export default function StudentDashboardPage() {
             </div>
           </div>
 
-          {/* Recommended Opportunities */}
+          {/* Recommended Opportunities & Internships */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" /> Recommended Scholarships & Grants
+                <Sparkles className="w-5 h-5 text-amber-500" /> Recommended Internships, Jobs &amp; Grants
               </h3>
               <Link href="/opportunities" className="text-xs font-bold text-blue-600 hover:text-blue-700">
                 View All
@@ -202,7 +247,7 @@ export default function StudentDashboardPage() {
                   <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between font-bold">
                     <span className="text-emerald-700">{opp.financial_aid_amount || 'Merit Aid'}</span>
                     <Link href={`/opportunities/${opp.slug}`} className="text-blue-600 hover:text-blue-700">
-                      Apply
+                      View Details
                     </Link>
                   </div>
                 </div>

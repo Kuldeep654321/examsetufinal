@@ -213,18 +213,21 @@ export default async function InstitutionsDirectoryPage({
 
             {/* Footer */}
             <div className="px-6 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-semibold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> UGC / MoE Recognized
-              </span>
-
               <a
                 href={inst.official_website}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+              >
+                Official Site <ExternalLink className="w-3 h-3" />
+              </a>
+
+              <Link
+                href={`/institutions/${inst.slug}`}
                 className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                Official Website <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+                College Profile <ArrowRight className="w-3.5 h-3.5 transition group-hover:translate-x-1" />
+              </Link>
             </div>
           </div>
         ))}

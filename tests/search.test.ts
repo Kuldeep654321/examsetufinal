@@ -29,6 +29,6 @@ describe('Global Typo-Tolerant Search', () => {
     );
 
     expect(res.rows.length).toBeGreaterThan(0);
-    expect(res.rows[0].slug).toBe('nsp-central-sector-scholarship-2027');
+    expect(res.rows[0].slug).toBe('nsp-pm-usp-central-sector-scholarship-2026');
   });
 });
