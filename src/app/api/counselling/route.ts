@@ -24,23 +24,7 @@ export async function GET(req: NextRequest) {
         ca.helpline_number,
         ca.contact_email,
         ca.is_verified,
-        ca.last_verified_at,
-        COALESCE(
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', cp.id,
-                'title', cp.title,
-                'slug', cp.slug,
-                'cycle_year', cp.cycle_year,
-                'status', cp.status,
-                'official_portal_url', cp.official_portal_url
-              )
-            )
-            FROM counselling_processes cp
-            WHERE cp.authority_id = ca.id
-          ), '[]'::json
-        ) as processes
+        ca.last_verified_at
       FROM counselling_authorities ca
       WHERE ca.is_verified = true
     `;
@@ -61,12 +45,21 @@ export async function GET(req: NextRequest) {
 
     sql += ` ORDER BY ca.short_name ASC`;
 
-    const res = await query(sql, params);
+    const authRes = await query(sql, params);
+    const procRes = await query(`
+      SELECT id, authority_id, title, slug, cycle_year, status, official_portal_url
+      FROM counselling_processes
+    `);
+
+    const data = authRes.rows.map((auth: any) => ({
+      ...auth,
+      processes: procRes.rows.filter((p: any) => p.authority_id === auth.id || p.authority_id === auth.slug),
+    }));
 
     return NextResponse.json({
       success: true,
-      data: res.rows,
-      total: res.rows.length,
+      data,
+      total: data.length,
     });
   } catch (err: any) {
     console.error('API /counselling Error:', err);

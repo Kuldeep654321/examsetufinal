@@ -101,12 +101,12 @@ async function getExamData(slug: string) {
       id, cycle_year, event_type, title, start_date, end_date, is_extended, previous_end_date,
       (
         CASE
-          WHEN status = 'unannounced' OR (start_date IS NULL AND end_date IS NULL) THEN 'unannounced'::event_status
-          WHEN status = 'delayed' THEN 'delayed'::event_status
-          WHEN end_date IS NOT NULL AND CURRENT_DATE > end_date THEN 'completed'::event_status
-          WHEN end_date IS NOT NULL AND CURRENT_DATE >= end_date - INTERVAL '3 days' AND CURRENT_DATE <= end_date THEN 'closing_soon'::event_status
-          WHEN (start_date IS NOT NULL AND CURRENT_DATE >= start_date AND (end_date IS NULL OR CURRENT_DATE <= end_date)) THEN 'open'::event_status
-          WHEN start_date IS NOT NULL AND CURRENT_DATE < start_date THEN 'upcoming'::event_status
+          WHEN status = 'unannounced' OR (start_date IS NULL AND end_date IS NULL) THEN 'unannounced'
+          WHEN status = 'delayed' THEN 'delayed'
+          WHEN end_date IS NOT NULL AND CURRENT_DATE > end_date THEN 'completed'
+          WHEN end_date IS NOT NULL AND CURRENT_DATE >= end_date - INTERVAL '3 days' AND CURRENT_DATE <= end_date THEN 'closing_soon'
+          WHEN (start_date IS NOT NULL AND CURRENT_DATE >= start_date AND (end_date IS NULL OR CURRENT_DATE <= end_date)) THEN 'open'
+          WHEN start_date IS NOT NULL AND CURRENT_DATE < start_date THEN 'upcoming'
           ELSE status
         END
       ) as status,

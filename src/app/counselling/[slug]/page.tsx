@@ -41,81 +41,72 @@ async function getCounsellingData(slug: string) {
       ca.helpline_number,
       ca.contact_email,
       ca.is_verified,
-      ca.last_verified_at,
-      COALESCE(
-        (
-          SELECT json_agg(
-            json_build_object(
-              'id', cp.id,
-              'title', cp.title,
-              'slug', cp.slug,
-              'cycle_year', cp.cycle_year,
-              'official_portal_url', cp.official_portal_url,
-              'notification_url', cp.notification_url,
-              'process_overview', cp.process_overview,
-              'eligibility_summary', cp.eligibility_summary,
-              'reservation_summary', cp.reservation_summary,
-              'rounds_structure', cp.rounds_structure,
-              'step_by_step_process', cp.step_by_step_process,
-              'required_documents', cp.required_documents,
-              'seat_matrix_info', cp.seat_matrix_info,
-              'fees_info', cp.fees_info,
-              'status', cp.status
-            )
-          )
-          FROM counselling_processes cp
-          WHERE cp.authority_id = ca.id
-        ), '[]'::json
-      ) as processes
+      ca.last_verified_at
     FROM counselling_authorities ca
     WHERE ca.slug = $1`,
     [slug]
   );
 
   if (authRes.rows.length > 0) {
-    return { type: 'authority', data: authRes.rows[0] };
+    const auth = authRes.rows[0];
+    const procRes = await query(
+      `SELECT
+        id, title, slug, cycle_year, official_portal_url, notification_url,
+        process_overview, eligibility_summary, reservation_summary,
+        rounds_structure, step_by_step_process, required_documents,
+        seat_matrix_info, fees_info, status
+      FROM counselling_processes
+      WHERE authority_id = $1 OR authority_id = $2`,
+      [auth.id, auth.slug]
+    );
+
+    return {
+      type: 'authority',
+      data: {
+        ...auth,
+        processes: procRes.rows,
+      },
+    };
   }
 
   // Try process slug
   const procRes = await query(
     `SELECT
-      cp.id,
-      cp.authority_id,
-      cp.cycle_year,
-      cp.title,
-      cp.slug,
-      cp.official_portal_url,
-      cp.notification_url,
-      cp.process_overview,
-      cp.eligibility_summary,
-      cp.reservation_summary,
-      cp.rounds_structure,
-      cp.step_by_step_process,
-      cp.required_documents,
-      cp.seat_matrix_info,
-      cp.fees_info,
-      cp.status,
-      cp.last_verified_at,
-      json_build_object(
-        'id', ca.id,
-        'name', ca.name,
-        'short_name', ca.short_name,
-        'slug', ca.slug,
-        'stream', ca.stream,
-        'jurisdiction', ca.jurisdiction,
-        'official_website', ca.official_website,
-        'official_domain', ca.official_domain,
-        'helpline_number', ca.helpline_number,
-        'contact_email', ca.contact_email
-      ) as authority
-    FROM counselling_processes cp
-    JOIN counselling_authorities ca ON cp.authority_id = ca.id
-    WHERE cp.slug = $1`,
+      id, authority_id, cycle_year, title, slug, official_portal_url,
+      notification_url, process_overview, eligibility_summary, reservation_summary,
+      rounds_structure, step_by_step_process, required_documents,
+      seat_matrix_info, fees_info, status, last_verified_at
+    FROM counselling_processes
+    WHERE slug = $1`,
     [slug]
   );
 
   if (procRes.rows.length > 0) {
-    return { type: 'process', data: procRes.rows[0] };
+    const proc = procRes.rows[0];
+    const authorityRes = await query(
+      `SELECT
+        id, name, short_name, slug, stream, jurisdiction, conducting_body,
+        official_website, official_domain, helpline_number, contact_email
+      FROM counselling_authorities
+      WHERE id = $1 OR slug = $1`,
+      [proc.authority_id]
+    );
+
+    return {
+      type: 'process',
+      data: {
+        ...proc,
+        authority: authorityRes.rows[0] || {
+          name: proc.title,
+          short_name: proc.slug,
+          stream: 'National',
+          jurisdiction: 'All India',
+          conducting_body: 'Official Authority',
+          official_website: proc.official_portal_url,
+          official_domain: 'gov.in',
+        },
+      },
+    };
   }
 
   return null;
@@ -260,29 +251,90 @@ export default async function CounsellingDetailPage({ params }: PageProps) {
           {/* Official Rounds Structure & Mechanics */}
           {proc.rounds_structure && proc.rounds_structure.length > 0 && (
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-              <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-indigo-600" /> Official Counselling Rounds & Seat Rules
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-indigo-600" /> Official Counselling Rounds & Seat Rules
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Multi-tier round structure, actual session schedules, and round-wise seat progression rules.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs font-black uppercase px-3 py-1 rounded-full ${
+                      proc.status === 'concluded' || proc.status === 'completed'
+                        ? 'bg-slate-100 text-slate-700 border border-slate-300'
+                        : proc.status === 'ongoing' || proc.status === 'active'
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse'
+                        : 'bg-amber-100 text-amber-800 border border-amber-300'
+                    }`}
+                  >
+                    Cycle Status: {proc.status === 'concluded' ? 'Concluded / Closed' : proc.status === 'ongoing' ? 'Active / In Progress' : 'Schedule Awaited'}
+                  </span>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {proc.rounds_structure.map((round: any, rIdx: number) => (
-                  <div key={rIdx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm text-slate-900">
-                        {round.name}
-                      </h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
-                        {round.status === 'unannounced' ? 'Schedule Awaited' : round.status}
-                      </span>
+                {proc.rounds_structure.map((round: any, rIdx: number) => {
+                  const isCompleted = round.status === 'completed' || round.status === 'concluded';
+                  const isOngoing = round.status === 'ongoing' || round.status === 'active';
+                  const isUpcoming = round.status === 'upcoming';
+
+                  return (
+                    <div
+                      key={rIdx}
+                      className={`p-5 rounded-2xl border space-y-2.5 transition ${
+                        isOngoing
+                          ? 'bg-emerald-50/50 border-emerald-200 ring-1 ring-emerald-400/50 shadow-sm'
+                          : isCompleted
+                          ? 'bg-slate-50 border-slate-200'
+                          : 'bg-amber-50/40 border-amber-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${isOngoing ? 'bg-emerald-500 animate-pulse' : isCompleted ? 'bg-slate-400' : 'bg-amber-400'}`} />
+                          {round.name}
+                        </h4>
+                        <span
+                          className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                            isOngoing
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : isCompleted
+                              ? 'bg-slate-200 text-slate-700'
+                              : isUpcoming
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          }`}
+                        >
+                          {isOngoing
+                            ? 'Ongoing / Active'
+                            : isCompleted
+                            ? 'Completed / Concluded'
+                            : isUpcoming
+                            ? 'Upcoming Round'
+                            : 'Schedule Awaited'}
+                        </span>
+                      </div>
+
+                      {round.schedule_dates && (
+                        <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 bg-white/80 p-2 rounded-lg border border-slate-200/60">
+                          <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                          <span>Dates: <strong>{round.schedule_dates}</strong></span>
+                        </div>
+                      )}
+
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        {round.description}
+                      </p>
+
+                      <div className="pt-2 border-t border-slate-200/60 text-xs text-slate-700">
+                        <strong>Seat Rules:</strong> {round.rules_summary}
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {round.description}
-                    </p>
-                    <div className="pt-2 border-t border-slate-200/60 text-xs text-slate-700">
-                      <strong>Seat Rules:</strong> {round.rules_summary}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

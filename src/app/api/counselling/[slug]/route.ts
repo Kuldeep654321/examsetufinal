@@ -26,42 +26,32 @@ export async function GET(
         ca.helpline_number,
         ca.contact_email,
         ca.is_verified,
-        ca.last_verified_at,
-        COALESCE(
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', cp.id,
-                'title', cp.title,
-                'slug', cp.slug,
-                'cycle_year', cp.cycle_year,
-                'official_portal_url', cp.official_portal_url,
-                'notification_url', cp.notification_url,
-                'process_overview', cp.process_overview,
-                'eligibility_summary', cp.eligibility_summary,
-                'reservation_summary', cp.reservation_summary,
-                'rounds_structure', cp.rounds_structure,
-                'step_by_step_process', cp.step_by_step_process,
-                'required_documents', cp.required_documents,
-                'seat_matrix_info', cp.seat_matrix_info,
-                'fees_info', cp.fees_info,
-                'status', cp.status
-              )
-            )
-            FROM counselling_processes cp
-            WHERE cp.authority_id = ca.id
-          ), '[]'::json
-        ) as processes
+        ca.last_verified_at
       FROM counselling_authorities ca
       WHERE ca.slug = $1`,
       [slug]
     );
 
     if (authRes.rows.length > 0) {
+      const auth = authRes.rows[0];
+      const procRes = await query(
+        `SELECT
+          id, title, slug, cycle_year, official_portal_url, notification_url,
+          process_overview, eligibility_summary, reservation_summary,
+          rounds_structure, step_by_step_process, required_documents,
+          seat_matrix_info, fees_info, status
+        FROM counselling_processes
+        WHERE authority_id = $1 OR authority_id = $2`,
+        [auth.id, auth.slug]
+      );
+
       return NextResponse.json({
         success: true,
         type: 'authority',
-        data: authRes.rows[0],
+        data: {
+          ...auth,
+          processes: procRes.rows,
+        },
       });
     }
 
@@ -84,30 +74,30 @@ export async function GET(
         cp.seat_matrix_info,
         cp.fees_info,
         cp.status,
-        cp.last_verified_at,
-        json_build_object(
-          'id', ca.id,
-          'name', ca.name,
-          'short_name', ca.short_name,
-          'slug', ca.slug,
-          'stream', ca.stream,
-          'jurisdiction', ca.jurisdiction,
-          'official_website', ca.official_website,
-          'official_domain', ca.official_domain,
-          'helpline_number', ca.helpline_number,
-          'contact_email', ca.contact_email
-        ) as authority
+        cp.last_verified_at
       FROM counselling_processes cp
-      JOIN counselling_authorities ca ON cp.authority_id = ca.id
       WHERE cp.slug = $1`,
       [slug]
     );
 
     if (procRes.rows.length > 0) {
+      const proc = procRes.rows[0];
+      const authorityRes = await query(
+        `SELECT
+          id, name, short_name, slug, stream, jurisdiction, conducting_body,
+          official_website, official_domain, helpline_number, contact_email
+        FROM counselling_authorities
+        WHERE id = $1 OR slug = $1`,
+        [proc.authority_id]
+      );
+
       return NextResponse.json({
         success: true,
         type: 'process',
-        data: procRes.rows[0],
+        data: {
+          ...proc,
+          authority: authorityRes.rows[0] || null,
+        },
       });
     }
 

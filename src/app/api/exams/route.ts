@@ -47,57 +47,7 @@ export async function GET(req: NextRequest) {
           'name', c.name,
           'slug', c.slug,
           'icon', c.icon
-        ) as category,
-        COALESCE(
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', ev.id,
-                'event_type', ev.event_type,
-                'title', ev.title,
-                'start_date', ev.start_date,
-                'end_date', ev.end_date,
-                'is_extended', ev.is_extended,
-                'previous_end_date', ev.previous_end_date,
-                'status', (
-                  CASE
-                    WHEN ev.status = 'unannounced' OR (ev.start_date IS NULL AND ev.end_date IS NULL) THEN 'unannounced'
-                    WHEN ev.status = 'delayed' THEN 'delayed'
-                    WHEN ev.end_date IS NOT NULL AND CURRENT_DATE > ev.end_date THEN 'completed'
-                    WHEN ev.end_date IS NOT NULL AND CURRENT_DATE >= ev.end_date - INTERVAL '3 days' AND CURRENT_DATE <= ev.end_date THEN 'closing_soon'
-                    WHEN (ev.start_date IS NOT NULL AND CURRENT_DATE >= ev.start_date AND (ev.end_date IS NULL OR CURRENT_DATE <= ev.end_date)) THEN 'open'
-                    WHEN ev.start_date IS NOT NULL AND CURRENT_DATE < ev.start_date THEN 'upcoming'
-                    ELSE ev.status
-                  END
-                ),
-                'official_source_url', ev.official_source_url,
-                'notes', ev.notes
-              ) ORDER BY
-                (CASE
-                  WHEN ev.start_date IS NOT NULL AND CURRENT_DATE >= ev.start_date AND (ev.end_date IS NULL OR CURRENT_DATE <= ev.end_date) THEN 1
-                  WHEN ev.end_date IS NOT NULL AND CURRENT_DATE >= ev.end_date - INTERVAL '3 days' AND CURRENT_DATE <= ev.end_date THEN 1
-                  WHEN ev.start_date IS NOT NULL AND CURRENT_DATE < ev.start_date THEN 2
-                  ELSE 3
-                END),
-                ev.start_date ASC NULLS LAST
-            )
-            FROM exam_events ev
-            WHERE ev.exam_id = e.id
-          ), '[]'::json
-        ) as events,
-        (
-          SELECT json_build_object(
-            'title', up.title,
-            'summary', up.summary,
-            'update_type', up.update_type,
-            'published_at', up.published_at,
-            'is_breaking', up.is_breaking
-          )
-          FROM exam_updates up
-          WHERE up.exam_id = e.id
-          ORDER BY up.published_at DESC
-          LIMIT 1
-        ) as latest_update
+        ) as category
       FROM exams e
       JOIN organizations o ON e.conducting_org_id = o.id
       JOIN categories c ON e.category_id = c.id
@@ -144,6 +94,31 @@ export async function GET(req: NextRequest) {
 
     const res = await query(sql, params);
 
+    // Fetch events for these exams
+    const eventsRes = await query(`
+      SELECT
+        id, exam_id, event_type, title, start_date, end_date,
+        is_extended, previous_end_date, status, official_source_url, notes
+      FROM exam_events
+    `);
+
+    // Fetch latest updates
+    const updatesRes = await query(`
+      SELECT exam_id, title, summary, update_type, published_at, is_breaking
+      FROM exam_updates
+      ORDER BY published_at DESC
+    `);
+
+    const data = res.rows.map((exam: any) => {
+      const examEvents = eventsRes.rows.filter((ev: any) => ev.exam_id === exam.id);
+      const latestUpdate = updatesRes.rows.find((up: any) => up.exam_id === exam.id) || null;
+      return {
+        ...exam,
+        events: examEvents,
+        latest_update: latestUpdate,
+      };
+    });
+
     // Total count
     const countSql = `SELECT COUNT(*) as total FROM exams WHERE is_active = true`;
     const countRes = await query(countSql);
@@ -151,7 +126,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: res.rows,
+      data,
       pagination: {
         page,
         limit,

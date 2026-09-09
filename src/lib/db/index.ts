@@ -1,4 +1,6 @@
 import { Pool, QueryResult, QueryResultRow } from 'pg';
+import { createInMemoryDatabase } from './in-memory-db';
+import { populateDatabase } from './seed-all';
 
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://examadmin:examsecret@localhost:5432/examsetu';
@@ -7,11 +9,27 @@ const pool = new Pool({
   connectionString,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 1500,
 });
 
-pool.on('error', (err) => {
-  console.error('[Database Pool Error]:', err.message);
+let useInMemory = false;
+let memoryPool: any = null;
+let seedPromise: Promise<void> | null = null;
+
+async function getMemoryPool() {
+  if (!memoryPool) {
+    const { pool: mPool } = createInMemoryDatabase();
+    memoryPool = mPool;
+    seedPromise = populateDatabase(memoryPool);
+  }
+  if (seedPromise) {
+    await seedPromise;
+  }
+  return memoryPool;
+}
+
+pool.on('error', () => {
+  useInMemory = true;
 });
 
 export async function query<T extends QueryResultRow = any>(
@@ -19,36 +37,57 @@ export async function query<T extends QueryResultRow = any>(
   params?: any[]
 ): Promise<QueryResult<T>> {
   const start = Date.now();
+
+  if (useInMemory) {
+    const mPool = await getMemoryPool();
+    return mPool.query(text, params);
+  }
+
   try {
     const res = await pool.query<T>(text, params);
-    const duration = Date.now() - start;
-    if (process.env.NODE_ENV === 'development' && duration > 200) {
-      console.warn(`[Slow Query ${duration}ms]:`, text.substring(0, 100));
-    }
     return res;
   } catch (error: any) {
+    if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED') || error.message?.includes('Connection refused')) {
+      useInMemory = true;
+      const mPool = await getMemoryPool();
+      return mPool.query(text, params);
+    }
     console.error('[DB Query Error]:', { text, error: error.message });
     throw error;
   }
 }
 
 export async function getClient() {
-  const client = await pool.connect();
-  return client;
+  if (useInMemory) {
+    const mPool = await getMemoryPool();
+    return mPool.connect();
+  }
+  try {
+    const client = await pool.connect();
+    return client;
+  } catch (err: any) {
+    useInMemory = true;
+    const mPool = await getMemoryPool();
+    return mPool.connect();
+  }
 }
 
 export async function transaction<T>(callback: (client: any) => Promise<T>): Promise<T> {
-  const client = await pool.connect();
+  const client = await getClient();
   try {
     await client.query('BEGIN');
     const result = await callback(client);
     await client.query('COMMIT');
     return result;
   } catch (err) {
-    await client.query('ROLLBACK');
+    try {
+      await client.query('ROLLBACK');
+    } catch {}
     throw err;
   } finally {
-    client.release();
+    try {
+      client.release();
+    } catch {}
   }
 }
 

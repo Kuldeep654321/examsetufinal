@@ -44,22 +44,7 @@ async function getCounsellingAuthorities(stream?: string, q?: string): Promise<C
       ca.helpline_number,
       ca.contact_email,
       ca.is_verified,
-      ca.last_verified_at,
-      COALESCE(
-        (
-          SELECT json_agg(
-            json_build_object(
-              'id', cp.id,
-              'title', cp.title,
-              'slug', cp.slug,
-              'cycle_year', cp.cycle_year,
-              'status', cp.status
-            )
-          )
-          FROM counselling_processes cp
-          WHERE cp.authority_id = ca.id
-        ), '[]'::json
-      ) as processes
+      ca.last_verified_at
     FROM counselling_authorities ca
     WHERE ca.is_verified = true
   `;
@@ -80,8 +65,21 @@ async function getCounsellingAuthorities(stream?: string, q?: string): Promise<C
 
   sql += ` ORDER BY ca.short_name ASC`;
 
-  const res = await query(sql, params);
-  return res.rows;
+  const authRes = await query(sql, params);
+  const procRes = await query(`
+    SELECT id, authority_id, title, slug, cycle_year, status, official_portal_url
+    FROM counselling_processes
+  `);
+
+  const authorities = authRes.rows.map((auth: any) => {
+    const processes = procRes.rows.filter((p: any) => p.authority_id === auth.id || p.authority_id === auth.slug);
+    return {
+      ...auth,
+      processes,
+    };
+  });
+
+  return authorities;
 }
 
 export default async function CounsellingDirectoryPage({
@@ -197,20 +195,41 @@ export default async function CounsellingDirectoryPage({
 
               {/* Active / Mapped Processes */}
               {auth.processes && auth.processes.length > 0 && (
-                <div className="space-y-1.5 pt-1">
+                <div className="space-y-2 pt-1">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                    Detailed Counselling Guides:
+                    Counselling Cycles & Guides:
                   </span>
-                  {auth.processes.map((proc: any) => (
-                    <Link
-                      key={proc.id}
-                      href={`/counselling/${proc.slug}`}
-                      className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center justify-between p-2 rounded-xl bg-blue-50/50 hover:bg-blue-50 border border-blue-100/60 transition"
-                    >
-                      <span className="truncate">{proc.title}</span>
-                      <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                    </Link>
-                  ))}
+                  {auth.processes.map((proc: any) => {
+                    const isConcluded = proc.status === 'concluded' || proc.status === 'completed';
+                    const isOngoing = proc.status === 'ongoing' || proc.status === 'active' || proc.status === 'open';
+                    return (
+                      <Link
+                        key={proc.id}
+                        href={`/counselling/${proc.slug}`}
+                        className="text-xs font-bold text-slate-800 hover:text-blue-700 flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 transition"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <span
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                              isOngoing ? 'bg-emerald-500 animate-pulse' : isConcluded ? 'bg-slate-400' : 'bg-amber-400'
+                            }`}
+                          />
+                          <span className="truncate">{proc.title}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ml-2 ${
+                            isOngoing
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              : isConcluded
+                              ? 'bg-slate-200 text-slate-700 border border-slate-300'
+                              : 'bg-amber-100 text-amber-800 border border-amber-300'
+                          }`}
+                        >
+                          {isOngoing ? 'Active / In Progress' : isConcluded ? 'Concluded' : 'Upcoming'}
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
