@@ -17,12 +17,33 @@ export interface DiffResult {
 
 function normalizeDate(d: any): string | null {
   if (!d) return null;
+
   if (d instanceof Date) {
-    return d.toISOString().substring(0, 10);
+    const value = new Date(d.getTime());
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
+
   if (typeof d === 'string') {
-    return d.substring(0, 10);
+    const trimmed = d.trim();
+    if (!trimmed) return null;
+
+    const isoMatch = trimmed.match(/^\d{4}-\d{2}-\d{2}$/);
+    if (isoMatch) return trimmed;
+
+    const parsed = new Date(trimmed);
+    if (!Number.isNaN(parsed.getTime())) {
+      const year = parsed.getFullYear();
+      const month = String(parsed.getMonth() + 1).padStart(2, '0');
+      const day = String(parsed.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    return trimmed.substring(0, 10);
   }
+
   return null;
 }
 

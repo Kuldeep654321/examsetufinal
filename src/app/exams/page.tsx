@@ -17,6 +17,7 @@ const categoriesList = [
   { slug: 'university-entrance', name: 'University (CUET)' },
   { slug: 'law-entrance', name: 'Law (CLAT)' },
   { slug: 'management-entrance', name: 'Management (CAT)' },
+  { slug: 'healthcare-recruitment', name: 'Healthcare Recruitment (NHM)' },
 ];
 
 import { EligibilityCalculator } from '@/components/tools/EligibilityCalculator';
@@ -41,7 +42,7 @@ function ExamsDirectoryContent() {
         if (selectedStream !== 'all') params.set('stream', selectedStream);
         if (selectedLevel !== 'all') params.set('level', selectedLevel);
         if (searchQuery.trim()) params.set('q', searchQuery.trim());
-        params.set('limit', '30');
+        params.set('limit', '100');
 
         const res = await fetch(`/api/exams?${params.toString()}`);
         if (res.ok) {

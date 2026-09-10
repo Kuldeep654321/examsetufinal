@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+coverage
+npm-debug.log*
+README.md
+ARCHITECTURE.md
+COMPREHENSIVE_EDUCATION_ECOSYSTEM_AUDIT.md
+EXAMSETU_FORENSIC_ARCHITECTURE_AND_EXPANSION_REPORT.md

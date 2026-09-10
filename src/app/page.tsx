@@ -31,7 +31,7 @@ import {
   Building2
 } from 'lucide-react';
 import { useAuth } from '@/components/layout/AuthContext';
-import { StudentPersonalizer, ProfileFilterState, PRESET_PROFILES } from '@/components/home/StudentPersonalizer';
+import { ProfileFilterState, PRESET_PROFILES } from '@/components/home/StudentPersonalizer';
 import { filterExamsForProfile, filterOpportunitiesForProfile } from '@/lib/recommendation-engine';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { OppCard } from '@/components/opportunities/OppCard';
@@ -58,7 +58,7 @@ export default function HomePage() {
     async function loadData() {
       try {
         const [examsRes, oppsRes] = await Promise.all([
-          fetch('/api/exams?limit=40'),
+          fetch('/api/exams?limit=100'),
           fetch('/api/opportunities?limit=40'),
         ]);
 
@@ -116,10 +116,6 @@ export default function HomePage() {
       });
     }
   }, [user]);
-
-  const handleProfileChange = (newProfile: ProfileFilterState) => {
-    setProfile(newProfile);
-  };
 
   // Filter exams strictly tailored for current student stage
   const matchingExams = filterExamsForProfile(exams, {
@@ -201,12 +197,6 @@ export default function HomePage() {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Interactive Student Personalization Widget */}
-        <StudentPersonalizer
-          onProfileChange={handleProfileChange}
-          activeProfile={profile}
-        />
-
         {/* Live Breaking Updates Banner */}
         <section className="bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-amber-500/10 rounded-3xl p-5 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center space-x-3.5">

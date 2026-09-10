@@ -13,6 +13,29 @@
 
 ---
 
+## Current Product Snapshot
+
+ExamSetu is a verified education and government-career directory for Indian students. The current seed catalog contains **113 exams** across national, state, healthcare, professional, research, banking, railway, defence and design categories. The directory is designed to grow through official notifications; it does not invent dates when an authority has not published them.
+
+### What the website includes
+
+- **Exam directory:** UPSC, SSC, banking, insurance, railways, defence, State PSCs, MPESB, NHM, ESIC, ISRO, DRDO, BARC and other government recruitment exams.
+- **Entrance exams:** JEE, NEET, CUET, GATE, CAT, XAT, MAT, CMAT, CLAT, NIFT, NID DAT, UCEED, NATA and medical postgraduate exams.
+- **State-wise coverage:** State Services exams for state public service commissions, with state and Union Territory organization records.
+- **Healthcare recruitment:** NHM CHO, Staff Nurse, ANM, Pharmacist, Lab Technician and ESIC Nursing Officer.
+- **Professional exams:** CA Foundation, CS CSEET and CMA Foundation.
+- **Education ecosystem:** School boards, recognized courses, institutions, counselling authorities and career pathways.
+- **Student tools:** Exam search, eligibility filters, exam detail pages, dashboard, saved items, application tracker, notifications and data-quality views.
+- **Official-source model:** Each catalog record stores an official authority, portal, eligibility, pattern, documents, events and verification timestamp.
+
+### Main categories
+
+`Civil Services & UPSC` · `Staff Selection` · `Banking & Insurance` · `Railways` · `Defence` · `Teaching` · `Healthcare Recruitment` · `Engineering` · `Medical` · `University Entrance` · `Law` · `Management` · `School Boards` · `Professional Exams`
+
+> Exam dates, vacancies and application windows are cycle-specific. When a current notification is unavailable, ExamSetu stores the event as **unannounced** with null dates and links to the official portal.
+
+---
+
 ## 🏛️ 1. Platform Vision & Scope
 
 **ExamSetu** is India's authoritative, end-to-end **Education, Examination, Counselling, and Career Intelligence Platform**. It connects every stage of the Indian student journey with **100% verified primary-source government data** (`.gov.in`, `.nic.in`, `.ac.in`) and zero speculation.
@@ -100,7 +123,7 @@ ExamSetu features an intelligent recommendation engine (`src/lib/recommendation-
    • MEA Internship Programme
 ```
 
-- **1-Click Profile Switcher:** Switch between B.Tech 4th Year, Any Graduate, 12th PCM, 12th PCB, 12th Commerce, 12th Arts, Polytechnic, and Class 10th.
+- **Profile-based recommendations:** The dashboard can use a student's academic stage, stream and target category to filter relevant exams and opportunities.
 - **Client Persistence:** Saved in `localStorage` and synced with authenticated account settings.
 
 ---
@@ -137,7 +160,7 @@ ExamSetu Full-Stack Architecture:
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx                    # Personalized Home Page with 1-click stage switcher
-│   │   ├── exams/ & exams/[slug]/      # 40+ National & state entrance examinations
+│   │   ├── exams/ & exams/[slug]/      # National, state, recruitment and entrance examinations
 │   │   ├── counselling/ & [slug]/      # JoSAA, CSAB, MCC, AACCC, VCI counselling portal
 │   │   ├── boards/ & boards/[slug]/    # CBSE, CISCE, NIOS, MPBSE, UPMSP directory
 │   │   ├── courses/ & courses/[slug]/  # Recognized UG, PG, and Diploma degrees directory
@@ -229,7 +252,10 @@ npm run worker:daemon
 
 | Metric | Value | Primary Source Standard |
 |---|---|---|
-| **Monitored Official Sources** | **28** | `.gov.in`, `.nic.in`, `.ac.in` |
+| **Exam records in current seed catalog** | **113** | National, state, recruitment, professional and entrance exams |
+| **State PSC State Services records** | **28** | State-level official commission portals |
+| **Healthcare recruitment records** | **5** | NHM and ESIC roles |
+| **Monitored Official Sources** | **28+** | `.gov.in`, `.nic.in`, `.ac.in` |
 | **Counselling Authorities** | **11** | JoSAA, CSAB, MCC, AACCC, VCI, NLUs, CCMT, DU CSAS |
 | **Education Boards** | **10** | CBSE, CISCE, NIOS, MPBSE, UPMSP, BSEB, MSBSHSE, RBSE |
 | **Statutory Courses** | **14** | NMC, AICTE, BCI, PCI, INC, COA, UGC Recognized |

@@ -1,6 +1,29 @@
+import fs from 'fs';
+import path from 'path';
 import { Pool, QueryResult, QueryResultRow } from 'pg';
 import { createInMemoryDatabase } from './in-memory-db';
 import { populateDatabase } from './seed-all';
+
+function loadEnvFile() {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (!fs.existsSync(envPath)) return;
+
+  const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+
+    const [rawKey, ...rest] = trimmed.split('=');
+    const key = rawKey.trim();
+    let value = rest.join('=').trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] = value;
+  }
+}
+
+loadEnvFile();
 
 const connectionString =
   process.env.DATABASE_URL || 'postgresql://examadmin:examsecret@localhost:5432/examsetu';
@@ -47,7 +70,18 @@ export async function query<T extends QueryResultRow = any>(
     const res = await pool.query<T>(text, params);
     return res;
   } catch (error: any) {
-    if (error.code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED') || error.message?.includes('Connection refused')) {
+    const msg = error?.message ?? '';
+    const isConnectionError =
+      error?.code === 'ECONNREFUSED' ||
+      msg.includes('ECONNREFUSED') ||
+      msg.includes('Connection refused') ||
+      msg.includes('password authentication failed') ||
+      msg.includes('authentication failed') ||
+      msg.includes('database system is starting up') ||
+      msg.includes('does not exist') ||
+      msg.includes('relation "') && msg.includes(' does not exist');
+
+    if (isConnectionError) {
       useInMemory = true;
       const mPool = await getMemoryPool();
       return mPool.query(text, params);

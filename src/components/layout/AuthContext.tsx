@@ -10,12 +10,14 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const defaultAuthContext: AuthContextType = {
   user: null,
-  loading: true,
+  loading: false,
   refreshUser: async () => {},
   logout: async () => {},
-});
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,9 +26,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshUser = async () => {
     try {
       const res = await fetch('/api/auth/me');
+      if (res.status === 401) {
+        setUser(null);
+        return;
+      }
+
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user);
+        setUser(data.user ?? null);
       } else {
         setUser(null);
       }
@@ -58,4 +65,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

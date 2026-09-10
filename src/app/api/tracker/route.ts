@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 const trackerSchema = z.object({
   target_type: z.enum(['exam', 'opportunity']),
-  target_id: z.string().uuid(),
+  target_id: z.string().min(1),
   status: z.enum(['interested', 'will_apply', 'applied', 'admit_card_received', 'exam_completed', 'result_available']),
   application_number: z.string().optional(),
   roll_number: z.string().optional(),
